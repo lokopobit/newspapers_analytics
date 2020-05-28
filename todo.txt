@@ -1,5 +1,6 @@
-similarity measures between titulates texto (como para comprobar plagios)
+similarity measures between titulares texto (como para comprobar plagios)
 cuantas veces aparecen las personas, las cosas en general.
 analisis de sentimiento de las imagenes (politicos...)
 comparacion entre las imagenes de una misma noticia.
 clasificador de noticias
+anuncios de ese periodico, asi como empresas relacionadas
