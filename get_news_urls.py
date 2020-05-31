@@ -6,8 +6,22 @@ Created on Sun May 24 10:48:29 2020
 """
 
 # Load external libreries
+import json
 import requests
 from bs4 import BeautifulSoup  
+from selenium import webdriver
+from selenium.webdriver.firefox.options import Options
+
+def start_url_driver(url):
+    try:
+        options = Options()
+        options.headless = True
+        driver = webdriver.Firefox(executable_path=r'C:\Users\juan\Documents\geckodriver-v0.26.0-win64\geckodriver.exe', options=options)
+        driver.implicitly_wait(10)
+        driver.get(url)
+        return driver
+    except:
+        print('PROBLEM LOADING INITIAL PAGE')
 
 prensa_espannola = 'http://www.tnrelaciones.com/anexo/laprensa/index.html'
 prensa_autonomica = 'http://www.tnrelaciones.com/anexo/prensa_andalucia/index.html'
@@ -38,7 +52,11 @@ for data in data_es1:
     
     try:
         aux = data.text +'_'+ data.a['href']
+        d = start_url_driver(data.a['href'])
+        aux = data.text +'_'+ d.current_url
         urls_dict[classes_es1[i]].append(aux)
+        d.close()
+        print(aux)
     except:
         continue
     
@@ -50,7 +68,13 @@ for data in data_es2:
     
     try:
         aux = data.text +'_'+ data.a['href']
+        d = start_url_driver(data.a['href'])
+        aux = data.text +'_'+ d.current_url
         urls_dict[classes_es2[i]].append(aux)
+        d.close()
+        print(aux)
     except:
         continue
     
+# f = open('prensa_espannola.json', 'w')
+# json.dump(urls_dict, f)
