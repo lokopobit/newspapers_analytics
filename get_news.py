@@ -9,7 +9,7 @@ Created on Sat May 23 16:55:43 2020
 import newspaper
 
 # Building a news source
-paper = newspaper.build('https://www.abc.es/', language='es')
+paper = newspaper.build('http://www.tnrelaciones.com/cm/phptn/enlaces_tn/193/206/', language='es')
 
 # Extracting articles
 for article in paper.articles:
@@ -48,3 +48,20 @@ print(article1.movies)
 article1.nlp()
 print(article1.summary)
 print(article1.keywords)
+
+
+# # # # # # # # # #
+for key in urls_dict.keys():
+    print(key)
+    urls = urls_dict[key]
+    for url in urls:
+        url = url.split('_')
+        print(url[0])
+        paper = newspaper.build(url[1], language='es')
+        print(paper.brand)
+        print(paper.description)
+        print(paper.size())
+
+        
+
+
