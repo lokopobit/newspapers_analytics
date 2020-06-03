@@ -6,5 +6,6 @@ clasificador de noticias
 anuncios de ese periodico, asi como empresas relacionadas
 periodicos relacionados entre si, bajo la misma direccion o empresa mediatica.
 comprobar si los jefes del periodico poseen otras empresas.
+news tracking
 
 https://github.com/fhamborg/news-please
