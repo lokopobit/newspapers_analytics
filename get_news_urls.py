@@ -21,60 +21,67 @@ def start_url_driver(url):
         driver.get(url)
         return driver
     except:
-        print('PROBLEM LOADING INITIAL PAGE')
+        print('ERROR: LOADING INITIAL PAGE')
 
-prensa_espannola = 'http://www.tnrelaciones.com/anexo/laprensa/index.html'
+
+
+def prensa_es(save=False):
+    
+    def create_dict(urls_dict, data_es, classes_es):
+        i = 0
+        for data in data_es:
+            if data.name == 'h4':
+                i += 1
+                urls_dict[classes_es[i]] = []
+            
+            try:
+                aux = data.text +'_'+ data.a['href']
+                d = start_url_driver(data.a['href'])
+                aux = data.text +'_'+ d.current_url
+                urls_dict[classes_es[i]].append(aux)
+                d.close()
+                print(aux)
+            except:
+                continue
+            
+        return urls_dict
+    
+    def remove_ads(auxs):
+        while True:
+            try:
+                auxs.find('div', {'class':'publi-google-extras'}).decompose()
+            except:
+                break
+        return auxs
+       
+    prensa_espannola = 'http://www.tnrelaciones.com/anexo/laprensa/index.html'
+
+    html_es = requests.get(prensa_espannola).text
+    soup_es = BeautifulSoup(html_es, features="lxml")
+    
+    auxs = soup_es.find(id = 'enlaces-extras-col-izq') ; data_es1 = list(auxs.find("h4").next_siblings)
+    classes_es1 = auxs.find_all('h4') ; classes_es1 = [ae.text for ae in classes_es1]
+    
+    auxs = soup_es.find(id = 'enlaces-extras-col-der') ; 
+    auxs = remove_ads(auxs)
+    data_es2 = list(auxs)
+    classes_es2 = auxs.find_all('h4') ; classes_es2 = [ae.text for ae in classes_es2]
+    classes_es2 = classes_es1[-1:] + classes_es2
+    
+    urls_dict = {}
+    urls_dict[classes_es1[0]] = []
+    urls_dict = create_dict(urls_dict, data_es1, classes_es1)
+        
+    urls_dict = create_dict(urls_dict, data_es2, classes_es2)
+        
+    if save:        
+        f = open('prensa_espannola.json', 'w')
+        json.dump(urls_dict, f)
+        f.close()
+        
+    return urls_dict
+
+urls_dict = prensa_es()     
+   
 prensa_autonomica = 'http://www.tnrelaciones.com/anexo/prensa_andalucia/index.html'
-
-html_es = requests.get(prensa_espannola).text
-soup_es = BeautifulSoup(html_es, features="lxml")
-
-auxs = soup_es.find(id = 'enlaces-extras-col-izq') ; data_es1 = list(auxs.find("h4").next_siblings)
-classes_es1 = auxs.find_all('h4') ; classes_es1 = [ae.text for ae in classes_es1]
-
-auxs = soup_es.find(id = 'enlaces-extras-col-der') ; 
-while True:
-    try:
-        auxs.find('div', {'class':'publi-google-extras'}).decompose()
-    except:
-        break
-data_es2 = list(auxs)
-classes_es2 = auxs.find_all('h4') ; classes_es2 = [ae.text for ae in classes_es2]
-classes_es2 = classes_es1[-1:] + classes_es2
-
-urls_dict = {}
-i = 0
-urls_dict[classes_es1[i]] = []
-for data in data_es1:
-    if data.name == 'h4':
-        i += 1
-        urls_dict[classes_es1[i]] = []
     
-    try:
-        aux = data.text +'_'+ data.a['href']
-        d = start_url_driver(data.a['href'])
-        aux = data.text +'_'+ d.current_url
-        urls_dict[classes_es1[i]].append(aux)
-        d.close()
-        print(aux)
-    except:
-        continue
-    
-i = 0
-for data in data_es2:
-    if data.name == 'h4':
-        i += 1
-        urls_dict[classes_es2[i]] = []
-    
-    try:
-        aux = data.text +'_'+ data.a['href']
-        d = start_url_driver(data.a['href'])
-        aux = data.text +'_'+ d.current_url
-        urls_dict[classes_es2[i]].append(aux)
-        d.close()
-        print(aux)
-    except:
-        continue
-    
-# f = open('prensa_espannola.json', 'w')
-# json.dump(urls_dict, f)
