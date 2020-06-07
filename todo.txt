@@ -9,5 +9,5 @@ comprobar si los jefes del periodico poseen otras empresas.
 news tracking
 5W1H
 Mongodb
-
+GDELT Project
 https://github.com/fhamborg/news-please
