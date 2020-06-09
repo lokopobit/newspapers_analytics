@@ -70,16 +70,25 @@ j = 0
 base = ['authors', 'date_download', 'date_modify', 'date_publish', 'description', 
         'filename', 'image_url', 'language', 'localpath', 'title', 'title_page', 
         'title_rss', 'source_domain', 'maintext', 'url']
+error_files = []
 for file in os.listdir(path):
     if file[-5:] == '.json':
-        f = open(os.path.join(path, file), 'r')
-        art = json.load(f)
+        try:
+            f = open(os.path.join(path, file), 'r')
+            art = json.load(f)
+            f.close()
+        except:
+            error_files.append(file)
+            continue
         keys = list(art.keys())
         if keys != base:
             print('amos tu manco')
     j += 1
-        
-    if j % 100:
+    
+    # if (j >10):
+    #     break
+    
+    if j % 10000 == 0:
         print(j)
         
         
