@@ -26,7 +26,7 @@ def split_folder():
     
 #
 def json_keys_checking(path, base, test=False):
-    error_files = []   
+    error_files = []  
     j = 0
     for file in os.listdir(path):
         if file[-5:] == '.json':
@@ -40,6 +40,8 @@ def json_keys_checking(path, base, test=False):
             keys = list(art.keys())
             if keys != base:
                 print('amos tu manco')
+            if file.count('_') <= 2: # non articles
+                error_files.append(file)
         j += 1
         
         if test and j >10:          
@@ -53,17 +55,47 @@ def json_keys_checking(path, base, test=False):
 def remove_error_files(path, error_files):
     for ef in error_files: os.remove(os.path.join(path, ef))
     print('Removed ', len(error_files), ' files')
+    
+#
+def find_duplicated_articles(path, path1):
+    f1 = os.listdir(path)
+    f2 = os.listdir(path_1)
+    for f in f1:
+        if f in f2:
+            print('cago en diez')
+
+#
+def find_article_years(path):
+    years = []
+    for file in os.listdir(path):
+        if file[-5:] == '.json':
+            f = open(os.path.join(path, file), 'r')
+            art = json.load(f)
+            f.close()
+            years.append(int(art['date_publish'][:4]))
+    return years
         
+
 base = ['authors', 'date_download', 'date_modify', 'date_publish', 'description', 
         'filename', 'image_url', 'language', 'localpath', 'title', 'title_page', 
         'title_rss', 'source_domain', 'maintext', 'url']
 path = r'C:\Users\juan\news-please-repo\data\2020\06\06\huelvabuenasnoticias.com'
 path = r'C:\Users\juan\news-please-repo\data\2020\06\10\diariodehuelva.es'
-path = r'C:\Users\juan\news-please-repo\data\2020\06\11\diariodehuelva.es'
+path_1 = r'C:\Users\juan\news-please-repo\data\2020\06\11\diariodehuelva.es'
 
 # Newspaaper cleaning
 error_files = json_keys_checking(path, base, test=False)
 remove_error_files(path, error_files)
+
+
+
+
+        
+
+        
+
+    
+
     
 
 
