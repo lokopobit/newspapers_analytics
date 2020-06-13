@@ -6,6 +6,7 @@ Created on Sat May 23 16:55:43 2020
 """
 
 # Load external libreries
+from multiprocessing import Pool
 import json
 import os
 
@@ -59,7 +60,7 @@ def remove_error_files(path, error_files):
 #
 def find_duplicated_articles(path, path1):
     f1 = os.listdir(path)
-    f2 = os.listdir(path_1)
+    f2 = os.listdir(path1)
     for f in f1:
         if f in f2:
             print('cago en diez')
@@ -76,18 +77,29 @@ def find_article_years(path):
     return years
         
 
-base = ['authors', 'date_download', 'date_modify', 'date_publish', 'description', 
-        'filename', 'image_url', 'language', 'localpath', 'title', 'title_page', 
-        'title_rss', 'source_domain', 'maintext', 'url']
-path = r'C:\Users\juan\news-please-repo\data\2020\06\06\huelvabuenasnoticias.com'
-path = r'C:\Users\juan\news-please-repo\data\2020\06\10\diariodehuelva.es'
-path_1 = r'C:\Users\juan\news-please-repo\data\2020\06\11\diariodehuelva.es'
-
-# Newspaaper cleaning
-error_files = json_keys_checking(path, base, test=False)
-remove_error_files(path, error_files)
-
-
+def main():
+    base = ['authors', 'date_download', 'date_modify', 'date_publish', 'description', 
+            'filename', 'image_url', 'language', 'localpath', 'title', 'title_page', 
+            'title_rss', 'source_domain', 'maintext', 'url']
+    path = r'C:\Users\juan\news-please-repo\data\2020\06\06\huelvabuenasnoticias.com'
+    path = r'C:\Users\juan\news-please-repo\data\2020\06\10\diariodehuelva.es'
+    path1 = r'C:\Users\juan\news-please-repo\data\2020\06\11\diariodehuelva.es'
+    
+    # Newspaaper cleaning
+    error_files = json_keys_checking(path, base, test=False)
+    remove_error_files(path, error_files)
+    
+print('amos tu manco')
+def ca(pin):
+    os.system('cmd /k "python"')
+    
+if __name__ == '__main__':
+    p = Pool(2)
+    p.map(ca, [1, 2])
+    print('asfd')
+    
+    
+# os.system('cmd /k "python"')
 
 
         
