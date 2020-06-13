@@ -6,8 +6,10 @@ Created on Sat May 23 16:55:43 2020
 """
 
 # Load external libreries
-from multiprocessing import Pool
-import json
+from multiprocessing import Pool, Lock
+from itertools import product
+import json, hjson
+from time import sleep
 import os
 
 #
@@ -75,7 +77,6 @@ def find_article_years(path):
             f.close()
             years.append(int(art['date_publish'][:4]))
     return years
-        
 
 def main():
     base = ['authors', 'date_download', 'date_modify', 'date_publish', 'description', 
@@ -89,14 +90,35 @@ def main():
     error_files = json_keys_checking(path, base, test=False)
     remove_error_files(path, error_files)
     
-print('amos tu manco')
-def ca(pin):
-    os.system('cmd /k "python"')
+def execute_newsplease_cli(newspaper_url):
+    config_path = r'C:\Users\juan\news-please-repo\config'
+    general_config = ''
+    news_config = 'sitelist.hjson'
+    
+    with lock:
+        sleep(10)
+        f = open(os.path.join(config_path, news_config), 'r')
+        nc = hjson.load(f)
+        nc['base_urls'][0]['url'] = newspaper_url
+        f.close()
+        
+        f = open(os.path.join(config_path, news_config), 'w')
+        hjson.dump(nc, f)
+        f.close()
+        
+    os.system('cmd /k "news-please"')
+        
+    
+def init_child(lock_):
+    global lock
+    lock = lock_
     
 if __name__ == '__main__':
-    p = Pool(2)
-    p.map(ca, [1, 2])
-    print('asfd')
+    lock = Lock()
+    p = Pool(2, initializer=init_child, initargs=(lock,))
+    # p.starmap(ca, [(3,4), (1,3)])
+    urls = ['https://www.diariodehuelva.es/', 'https://www.huelvabuenasnoticias.com/'] #,'http://huelva24.com/']
+    p.map(execute_newsplease_cli, urls)
     
     
 # os.system('cmd /k "python"')
