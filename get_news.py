@@ -7,11 +7,27 @@ Created on Sat May 23 16:55:43 2020
 
 # Load external libreries
 from multiprocessing import Pool, Lock
-from itertools import product
 import json, hjson
 from time import sleep
 import os
 
+#
+def fast_dir_walking(data_path):
+    dirs_dict = {}
+    year_dirs = [f.path for f in os.scandir(data_path) if f.is_dir()]
+    for year in year_dirs:
+        month_dirs = [f.path for f in os.scandir(year) if f.is_dir()]
+        for month in month_dirs:
+            day_dirs = [f.path for f in os.scandir(month) if f.is_dir()]
+            for day in day_dirs:
+                newsp_dirs = [f.path for f in os.scandir(day) if f.is_dir()]
+                for newsp in newsp_dirs:
+                    new_key = newsp.split('\\')[-1]
+                    if new_key not in dirs_dict.keys():
+                        dirs_dict[new_key] = []
+                    dirs_dict[new_key].append(newsp) # Remove data_path from newsp?
+    return dirs_dict
+                        
 #
 def split_folder(): 
     pre = r'C:\Users\juan\news-please-repo\data\2020\06\06'
@@ -82,13 +98,16 @@ def main():
     base = ['authors', 'date_download', 'date_modify', 'date_publish', 'description', 
             'filename', 'image_url', 'language', 'localpath', 'title', 'title_page', 
             'title_rss', 'source_domain', 'maintext', 'url']
-    path = r'C:\Users\juan\news-please-repo\data\2020\06\06\huelvabuenasnoticias.com'
-    path = r'C:\Users\juan\news-please-repo\data\2020\06\10\diariodehuelva.es'
-    path1 = r'C:\Users\juan\news-please-repo\data\2020\06\11\diariodehuelva.es'
+    
+    data_path = r'C:\Users\juan\news-please-repo\data'
+    dirs_dict = fast_dir_walking(data_path)
     
     # Newspaaper cleaning
-    error_files = json_keys_checking(path, base, test=False)
-    remove_error_files(path, error_files)
+    for key_ in dirs_dict.keys():
+        for newsp in dirs_dict[key_]:
+            print(newsp)
+            error_files = json_keys_checking(newsp, base, test=False)
+            remove_error_files(newsp, error_files)
     
 def execute_newsplease_cli(newspaper_url):
     config_path = r'C:\Users\juan\news-please-repo\config'
@@ -108,20 +127,19 @@ def execute_newsplease_cli(newspaper_url):
         
     os.system('cmd /k "news-please"')
         
-    
 def init_child(lock_):
     global lock
     lock = lock_
     
-if __name__ == '__main__':
+def multiprocess(n_pools):
     lock = Lock()
-    p = Pool(2, initializer=init_child, initargs=(lock,))
+    p = Pool(n_pools, initializer=init_child, initargs=(lock,))
     # p.starmap(ca, [(3,4), (1,3)])
     urls = ['https://www.diariodehuelva.es/', 'https://www.huelvabuenasnoticias.com/'] #,'http://huelva24.com/']
     p.map(execute_newsplease_cli, urls)
     
     
-# os.system('cmd /k "python"')
+
 
 
         
