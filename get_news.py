@@ -10,6 +10,7 @@ from multiprocessing import Pool, Lock
 import json, hjson
 from time import sleep
 import os
+import numpy as np
 
 #
 def fast_dir_walking(data_path):
@@ -76,12 +77,17 @@ def remove_error_files(path, error_files):
     print('Removed ', len(error_files), ' files')
     
 #
-def find_duplicated_articles(path, path1):
-    f1 = os.listdir(path)
-    f2 = os.listdir(path1)
-    for f in f1:
-        if f in f2:
-            print('cago en diez')
+def find_duplicated_articles(paths):
+
+    for path1 in paths:
+        f1 = os.listdir(path1)
+        for path2 in paths:
+            f2 = os.listdir(path2)
+            if path1 == path2:
+                continue
+            else:
+                aux = np.intersect1d(f1, f2)
+                print(aux)
 
 #
 def find_article_years(path):
@@ -101,14 +107,21 @@ def main():
     
     data_path = r'C:\Users\juan\news-please-repo\data'
     dirs_dict = fast_dir_walking(data_path)
+    f = open('already_cleaned.json', 'r') ; already_cleaned = json.load(f) ; f.close()
     
     # Newspaaper cleaning
     for key_ in dirs_dict.keys():
         for newsp in dirs_dict[key_]:
+            if newsp in already_cleaned[key_]:
+                continue
             print(newsp)
             error_files = json_keys_checking(newsp, base, test=False)
             remove_error_files(newsp, error_files)
-    
+        find_duplicated_articles(dirs_dict[key_])
+        
+    f = open('already_cleaned.json', 'w') ; json.dump(dirs_dict,f) ; f.close()
+
+#    
 def execute_newsplease_cli(newspaper_url):
     config_path = r'C:\Users\juan\news-please-repo\config'
     general_config = ''
@@ -126,16 +139,18 @@ def execute_newsplease_cli(newspaper_url):
         f.close()
         
     os.system('cmd /k "news-please"')
-        
+
+#        
 def init_child(lock_):
     global lock
     lock = lock_
-    
+ 
+#
 def multiprocess(n_pools):
     lock = Lock()
     p = Pool(n_pools, initializer=init_child, initargs=(lock,))
     # p.starmap(ca, [(3,4), (1,3)])
-    urls = ['https://www.diariodehuelva.es/', 'https://www.huelvabuenasnoticias.com/'] #,'http://huelva24.com/']
+    urls = ['https://www.diariodehuelva.es/', 'https://www.huelvabuenasnoticias.com/', 'http://huelva24.com/']
     p.map(execute_newsplease_cli, urls)
     
     
