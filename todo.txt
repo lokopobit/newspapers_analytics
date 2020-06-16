@@ -10,5 +10,3 @@ news tracking -> news cronologhy
 5W1H
 Mongodb
 GDELT Project 
-https://github.com/fhamborg/news-please -> after 10Gb huelvabuenasnoticias.com did not end. Check why scrapy is not
-stoping and if already downloaded items will be replaced when process restarted --> download between specific dates
