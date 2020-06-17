@@ -8,5 +8,4 @@ periodicos relacionados entre si, bajo la misma direccion o empresa mediatica.
 comprobar si los jefes del periodico poseen otras empresas.
 news tracking -> news cronologhy
 5W1H
-Mongodb
 GDELT Project 
