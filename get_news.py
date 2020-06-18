@@ -7,6 +7,7 @@ Created on Sat May 23 16:55:43 2020
 
 # Load external libreries
 from multiprocessing import Pool, Lock
+from pymongo import MongoClient
 import json, hjson
 from time import sleep
 import os
@@ -112,9 +113,10 @@ def main():
     # Newspaaper cleaning
     for key_ in dirs_dict.keys():
         for newsp in dirs_dict[key_]:
-            if newsp in already_cleaned[key_]:
-                continue
             print(newsp)
+            if newsp in already_cleaned[key_]:
+                print('Already cleaned')
+                continue
             error_files = json_keys_checking(newsp, base, test=False)
             remove_error_files(newsp, error_files)
         find_duplicated_articles(dirs_dict[key_])
@@ -153,9 +155,11 @@ def multiprocess(n_pools):
     urls = ['https://www.diariodehuelva.es/', 'https://www.huelvabuenasnoticias.com/', 'http://huelva24.com/']
     p.map(execute_newsplease_cli, urls)
     
-    
 
-
+# os.system('cmd /k "C:\\mongodb\\bin\\mongod.exe"')    
+# client = MongoClient()
+# db = client.test_database
+# collection=db.test_collection
 
         
 
