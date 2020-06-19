@@ -7,5 +7,6 @@ anuncios de ese periodico, asi como empresas relacionadas
 periodicos relacionados entre si, bajo la misma direccion o empresa mediatica.
 comprobar si los jefes del periodico poseen otras empresas.
 news tracking -> news cronologhy
+analisis de noticias estacional: en verano, navidad, semana santa, ...
 5W1H
 GDELT Project 
