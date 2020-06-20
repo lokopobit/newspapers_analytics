@@ -156,10 +156,23 @@ def multiprocess(n_pools):
     p.map(execute_newsplease_cli, urls)
     
 
-# os.system('cmd /k "C:\\mongodb\\bin\\mongod.exe"')    
-# client = MongoClient()
-# db = client.test_database
-# collection=db.test_collection
+os.system('cmd /k "C:\\mongodb\\bin\\mongod.exe"')    
+client = MongoClient()
+db = client.test_database
+collection = db.test_collection
+
+for key_ in dirs_dict.keys():
+    collection = db[key_]
+    for newsp in dirs_dict[key_]:
+        print(newsp)
+        for file in os.listdir(newsp):
+            if file[-5:] == '.json':
+                f = open(os.path.join(path, file), 'r')
+                art = json.load(f)
+                f.close()
+                collection.inset_one(art)
+
+client.close()
 
         
 
