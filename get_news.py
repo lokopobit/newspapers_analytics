@@ -8,6 +8,7 @@ Created on Sat May 23 16:55:43 2020
 # Load external libreries
 from multiprocessing import Pool, Lock
 from pymongo import MongoClient
+import win32com.shell.shell as shell
 import json, hjson
 from time import sleep
 import os
@@ -102,6 +103,7 @@ def find_article_years(path):
     return years
 
 def main():
+    store = False
     base = ['authors', 'date_download', 'date_modify', 'date_publish', 'description', 
             'filename', 'image_url', 'language', 'localpath', 'title', 'title_page', 
             'title_rss', 'source_domain', 'maintext', 'url']
@@ -122,6 +124,12 @@ def main():
         find_duplicated_articles(dirs_dict[key_])
         
     f = open('already_cleaned.json', 'w') ; json.dump(dirs_dict,f) ; f.close()
+        
+    if store:
+        f = open('already_stored.json', 'r') ; already_stored = json.load(f) ; f.close()
+        insert2mongo(dirs_dict, already_stored)
+        f = open('already_stored.json', 'w') ; json.dump(dirs_dict,f) ; f.close()
+        
 
 #    
 def execute_newsplease_cli(newspaper_url):
@@ -155,31 +163,33 @@ def multiprocess(n_pools):
     urls = ['https://www.diariodehuelva.es/', 'https://www.huelvabuenasnoticias.com/', 'http://huelva24.com/']
     p.map(execute_newsplease_cli, urls)
     
+#
+def insert2mongo(dirs_dict, already_stored):
+    # os.system('cmd /k "C:\\mongodb\\bin\\mongod.exe"')    
+    shell.ShellExecuteEx(lpVerb='runas', lpFile='cmd.exe', lpParameters='/c '+'net start MongoDB')    
+    client = MongoClient()
+    db = client.newsHuelva
+    db.list_collection_names()
+    # collection = db.test_collection
+    
+    for key_ in dirs_dict.keys():
+        collection = db[key_]
+        for newsp in dirs_dict[key_]:
+            print(newsp)
+            if newsp in already_stored[key_]:
+                continue
+            for file in os.listdir(newsp):
+                if file[-5:] == '.json':
+                    f = open(os.path.join(newsp, file), 'r')
+                    art = json.load(f)
+                    f.close()
+                    collection.insert_one(art)  
+    client.close()
+    shell.ShellExecuteEx(lpVerb='runas', lpFile='cmd.exe', lpParameters='/c '+'net stop MongoDB')
 
-os.system('cmd /k "C:\\mongodb\\bin\\mongod.exe"')    
-client = MongoClient()
-db = client.test_database
-collection = db.test_collection
 
-for key_ in dirs_dict.keys():
-    collection = db[key_]
-    for newsp in dirs_dict[key_]:
-        print(newsp)
-        for file in os.listdir(newsp):
-            if file[-5:] == '.json':
-                f = open(os.path.join(path, file), 'r')
-                art = json.load(f)
-                f.close()
-                collection.inset_one(art)
-
-client.close()
-
-        
-
-        
 
     
-
     
 
 
