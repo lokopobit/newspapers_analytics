@@ -103,7 +103,7 @@ def find_article_years(path):
     return years
 
 def main():
-    store = False
+    store = True
     base = ['authors', 'date_download', 'date_modify', 'date_publish', 'description', 
             'filename', 'image_url', 'language', 'localpath', 'title', 'title_page', 
             'title_rss', 'source_domain', 'maintext', 'url']
@@ -187,8 +187,30 @@ def insert2mongo(dirs_dict, already_stored):
     client.close()
     shell.ShellExecuteEx(lpVerb='runas', lpFile='cmd.exe', lpParameters='/c '+'net stop MongoDB')
 
-
-
+#
+def mongoQueries():
+    shell.ShellExecuteEx(lpVerb='runas', lpFile='cmd.exe', lpParameters='/c '+'net start MongoDB')    
+    client = MongoClient()
+    db = client.newsHuelva
+    
+    newsp = db[db.list_collection_names()[0]]
+    print(newsp.estimated_document_count())
+    # newsp.find_one()
+    aux = []
+    for art in newsp.find():
+        aux.extend(art['authors'])
+    a = np.unique(aux)
+    print(a)
+    aux = []
+    for art in newsp.find({'authors':'Jesús Pelayo'}):
+        aux.append(art['description'])
+    for aa in a:
+        b=newsp.find({'authors':aa})
+        print(aa, b.count())
+    
+    client.close()
+    shell.ShellExecuteEx(lpVerb='runas', lpFile='cmd.exe', lpParameters='/c '+'net stop MongoDB')
+    
     
     
 
