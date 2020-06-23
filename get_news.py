@@ -11,6 +11,7 @@ from pymongo import MongoClient
 import win32com.shell.shell as shell
 import json, hjson
 from time import sleep
+import configparser
 import os
 import numpy as np
 
@@ -134,7 +135,7 @@ def main():
 #    
 def execute_newsplease_cli(newspaper_url):
     config_path = r'C:\Users\juan\news-please-repo\config'
-    general_config = ''
+    general_config = 'config.cfg'
     news_config = 'sitelist.hjson'
     
     with lock:
@@ -147,6 +148,12 @@ def execute_newsplease_cli(newspaper_url):
         f = open(os.path.join(config_path, news_config), 'w')
         hjson.dump(nc, f)
         f.close()
+        
+        config = configparser.RawConfigParser()
+        config.read(os.path.join(config_path,general_config))
+        config.set('Scrapy', 'JOBDIRNAME', 'jobdir'+newspaper_url.split('.')[1])
+        with open(os.path.join(config_path,general_config), 'w') as configfile:
+            config.write(configfile)
         
     os.system('cmd /k "news-please"')
 
@@ -161,6 +168,7 @@ def multiprocess(n_pools):
     p = Pool(n_pools, initializer=init_child, initargs=(lock,))
     # p.starmap(ca, [(3,4), (1,3)])
     urls = ['https://www.diariodehuelva.es/', 'https://www.huelvabuenasnoticias.com/', 'http://huelva24.com/']
+    urls = ['https://huelvaya.es/', 'https://www.huelvainformacion.es/', 'http://www.huelvahoy.com/']
     p.map(execute_newsplease_cli, urls)
     
 #
@@ -189,18 +197,36 @@ def insert2mongo(dirs_dict, already_stored):
 
 #
 def mongoQueries():
+    
+    def unique_authors(newsp):
+        aux = []
+        for art in newsp.find():
+            aux.extend(art['authors'])
+        a = np.unique(aux)
+        return a
+    
     shell.ShellExecuteEx(lpVerb='runas', lpFile='cmd.exe', lpParameters='/c '+'net start MongoDB')    
     client = MongoClient()
     db = client.newsHuelva
     
     newsp = db[db.list_collection_names()[0]]
     print(newsp.estimated_document_count())
+ 
     # newsp.find_one()
-    aux = []
-    for art in newsp.find():
-        aux.extend(art['authors'])
-    a = np.unique(aux)
-    print(a)
+
+    print(unique_authors(newsp))
+    
+    
+    a=newsp.find()
+    aux=[]
+    for aa in a:
+        aux.append(aa['url'])
+    
+    a=newsp.find({'title':{'$eq':'Huelva, líder regional del sector apícola'}})
+    for aa in a:
+        print(aa['date_publish'])
+        print(aa['url'])
+    
     aux = []
     for art in newsp.find({'authors':'Jesús Pelayo'}):
         aux.append(art['description'])
