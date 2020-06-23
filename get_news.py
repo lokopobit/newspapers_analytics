@@ -63,8 +63,8 @@ def json_keys_checking(path, base, test=False):
             keys = list(art.keys())
             if keys != base:
                 print('amos tu manco')
-            if file.count('_') <= 2: # non articles
-                error_files.append(file)
+            # if file.count('_') <= 2: # non articles
+            #     error_files.append(file)
         j += 1
         
         if test and j >10:          
@@ -117,12 +117,15 @@ def main():
     for key_ in dirs_dict.keys():
         for newsp in dirs_dict[key_]:
             print(newsp)
+            if key_ not in already_cleaned.keys():
+                already_cleaned[key_] = []
+                
             if newsp in already_cleaned[key_]:
                 print('Already cleaned')
                 continue
             error_files = json_keys_checking(newsp, base, test=False)
             remove_error_files(newsp, error_files)
-        find_duplicated_articles(dirs_dict[key_])
+        # find_duplicated_articles(dirs_dict[key_])
         
     f = open('already_cleaned.json', 'w') ; json.dump(dirs_dict,f) ; f.close()
         
@@ -184,6 +187,9 @@ def insert2mongo(dirs_dict, already_stored):
         collection = db[key_]
         for newsp in dirs_dict[key_]:
             print(newsp)
+            if key_ not in already_stored.keys():
+                already_stored[key_] = []
+            
             if newsp in already_stored[key_]:
                 continue
             for file in os.listdir(newsp):
@@ -205,22 +211,25 @@ def mongoQueries():
         a = np.unique(aux)
         return a
     
+    def duplicated_articles(newsp):
+        a=newsp.find()
+        aux=[]
+        for aa in a:
+            aux.append(aa['url'])        
+        return len(aux), len(np.unique(aux))
+    
     shell.ShellExecuteEx(lpVerb='runas', lpFile='cmd.exe', lpParameters='/c '+'net start MongoDB')    
     client = MongoClient()
     db = client.newsHuelva
     
-    newsp = db[db.list_collection_names()[0]]
+    newsp = db[db.list_collection_names()[3]]
     print(newsp.estimated_document_count())
  
     # newsp.find_one()
 
     print(unique_authors(newsp))
-    
-    
-    a=newsp.find()
-    aux=[]
-    for aa in a:
-        aux.append(aa['url'])
+    print(duplicated_articles(newsp))    
+
     
     a=newsp.find({'title':{'$eq':'Huelva, líder regional del sector apícola'}})
     for aa in a:
