@@ -15,3 +15,6 @@ already_cleaned and already_stored jsons must be improved with a path length (fo
 crawles of the same day are not duplicated in the mongodb
 
 Another option to last paragraph problem is to store articles urls and avoid recrawling and remove duplicated recrawls.
+
+
+newsplease package datetime parser fails sometimes
