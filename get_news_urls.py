@@ -23,36 +23,34 @@ def start_url_driver(url):
     except:
         print('ERROR: LOADING INITIAL PAGE')
 
+def create_dict(urls_dict, data_es, classes_es):
+    i = 0
+    for data in data_es:
+        if data.name == 'h4':
+            i += 1
+            urls_dict[classes_es[i]] = []
+        
+        try:
+            aux = data.text +'_'+ data.a['href']
+            d = start_url_driver(data.a['href'])
+            aux = data.text +'_'+ d.current_url
+            urls_dict[classes_es[i]].append(aux)
+            d.close()
+            print(aux)
+        except:
+            continue
+        
+    return urls_dict
 
+def remove_ads(auxs):
+    while True:
+        try:
+            auxs.find('div', {'class':'publi-google-extras'}).decompose()
+        except:
+            break
+    return auxs
 
 def prensa_es(save=False):
-    
-    def create_dict(urls_dict, data_es, classes_es):
-        i = 0
-        for data in data_es:
-            if data.name == 'h4':
-                i += 1
-                urls_dict[classes_es[i]] = []
-            
-            try:
-                aux = data.text +'_'+ data.a['href']
-                d = start_url_driver(data.a['href'])
-                aux = data.text +'_'+ d.current_url
-                urls_dict[classes_es[i]].append(aux)
-                d.close()
-                print(aux)
-            except:
-                continue
-            
-        return urls_dict
-    
-    def remove_ads(auxs):
-        while True:
-            try:
-                auxs.find('div', {'class':'publi-google-extras'}).decompose()
-            except:
-                break
-        return auxs
        
     prensa_espannola = 'http://www.tnrelaciones.com/anexo/laprensa/index.html'
 
@@ -81,7 +79,29 @@ def prensa_es(save=False):
         
     return urls_dict
 
-urls_dict = prensa_es()     
+# urls_dict = prensa_es()     
    
-prensa_autonomica = 'http://www.tnrelaciones.com/anexo/prensa_andalucia/index.html'
+prensa_autonomica = 'http://www.tnrelaciones.com/anexo/prensautonomica/index.html'
+html_es = requests.get(prensa_autonomica).text
+soup_es = BeautifulSoup(html_es, features="lxml")
+
+auxs = soup_es.find(id = 'enlaces-extras-col-izq') ; 
+urls_autonomicas = [el.a['href'] for el in auxs.find_all("p")]
+auxs = soup_es.find(id = 'enlaces-extras-col-der') ; 
+urls_autonomicas.extend([el.a['href'] for el in auxs.find_all("p")])
+urls_autonomicas = ['http://www.tnrelaciones.com/anexo'+ax[2:] for ax in urls_autonomicas]
+
+
+auxs = soup_es.find(id = 'enlaces-extras-col-der') ; 
+auxs = remove_ads(auxs)
+data_es2 = list(auxs)
+classes_es2 = auxs.find_all('h4') ; classes_es2 = [ae.text for ae in classes_es2]
+classes_es2 = classes_es1[-1:] + classes_es2
+
+urls_dict = {}
+urls_dict[classes_es1[0]] = []
+urls_dict = create_dict(urls_dict, data_es1, classes_es1)
     
+urls_dict = create_dict(urls_dict, data_es2, classes_es2)
+
+
