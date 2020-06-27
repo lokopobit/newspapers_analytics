@@ -21,7 +21,7 @@ def start_url_driver(url):
         driver.get(url)
         return driver
     except:
-        print('ERROR: LOADING INITIAL PAGE')
+        print('ERROR: LOADING PAGE ', url)
 
 def create_dict(urls_dict, data_es, classes_es):
     i = 0
@@ -50,11 +50,9 @@ def remove_ads(auxs):
             break
     return auxs
 
-def prensa_es(save=False):
-       
-    prensa_espannola = 'http://www.tnrelaciones.com/anexo/laprensa/index.html'
-
-    html_es = requests.get(prensa_espannola).text
+def retrieve_urls_index(url):
+    
+    html_es = requests.get(url).text
     soup_es = BeautifulSoup(html_es, features="lxml")
     
     auxs = soup_es.find(id = 'enlaces-extras-col-izq') ; data_es1 = list(auxs.find("h4").next_siblings)
@@ -71,6 +69,12 @@ def prensa_es(save=False):
     urls_dict = create_dict(urls_dict, data_es1, classes_es1)
         
     urls_dict = create_dict(urls_dict, data_es2, classes_es2)
+    return urls_dict
+
+def prensa_es(save=False):
+       
+    prensa_espannola = 'http://www.tnrelaciones.com/anexo/laprensa/index.html'
+    urls_dict = retrieve_urls_index(prensa_espannola)
         
     if save:        
         f = open('prensa_espannola.json', 'w')
@@ -79,29 +83,33 @@ def prensa_es(save=False):
         
     return urls_dict
 
+def prensa_autonomica(save=False):
+
+    prensa_autonomica = 'http://www.tnrelaciones.com/anexo/prensautonomica/index.html'
+    html_es = requests.get(prensa_autonomica).text
+    soup_es = BeautifulSoup(html_es, features="lxml")
+    
+    auxs = soup_es.find(id = 'enlaces-extras-col-izq') ; 
+    urls_autonomicas = [el.a['href'] for el in auxs.find_all("p")]
+    auxs = soup_es.find(id = 'enlaces-extras-col-der') ; 
+    urls_autonomicas.extend([el.a['href'] for el in auxs.find_all("p")])
+    urls_autonomicas = ['http://www.tnrelaciones.com/anexo'+ax[2:] for ax in urls_autonomicas]
+    
+    urls_dict_autonomicas={}
+    for url_autonomica in urls_autonomicas:
+        urls_dict = retrieve_urls_index(url_autonomica)
+        urls_dict_autonomicas[url_autonomica.split('/')[-2]]=urls_dict
+        if save:        
+            f = open(url_autonomica.split('/')[-2]+'.json', 'w')
+            json.dump(urls_dict, f)
+            f.close()
+            
+    return urls_dict_autonomicas
+    
+    
 # urls_dict = prensa_es()     
    
-prensa_autonomica = 'http://www.tnrelaciones.com/anexo/prensautonomica/index.html'
-html_es = requests.get(prensa_autonomica).text
-soup_es = BeautifulSoup(html_es, features="lxml")
-
-auxs = soup_es.find(id = 'enlaces-extras-col-izq') ; 
-urls_autonomicas = [el.a['href'] for el in auxs.find_all("p")]
-auxs = soup_es.find(id = 'enlaces-extras-col-der') ; 
-urls_autonomicas.extend([el.a['href'] for el in auxs.find_all("p")])
-urls_autonomicas = ['http://www.tnrelaciones.com/anexo'+ax[2:] for ax in urls_autonomicas]
 
 
-auxs = soup_es.find(id = 'enlaces-extras-col-der') ; 
-auxs = remove_ads(auxs)
-data_es2 = list(auxs)
-classes_es2 = auxs.find_all('h4') ; classes_es2 = [ae.text for ae in classes_es2]
-classes_es2 = classes_es1[-1:] + classes_es2
-
-urls_dict = {}
-urls_dict[classes_es1[0]] = []
-urls_dict = create_dict(urls_dict, data_es1, classes_es1)
-    
-urls_dict = create_dict(urls_dict, data_es2, classes_es2)
 
 
