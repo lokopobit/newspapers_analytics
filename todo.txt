@@ -16,5 +16,7 @@ crawles of the same day are not duplicated in the mongodb
 
 Another option to last paragraph problem is to store articles urls and avoid recrawling and remove duplicated recrawls.
 
-
 newsplease package datetime parser fails sometimes
+
+To increase webpages index urls extraction with selenium launch driver oonce and 
+create new tabs instead of launching-clsing driver for each url.
