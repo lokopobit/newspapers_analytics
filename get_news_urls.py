@@ -7,6 +7,7 @@ Created on Sun May 24 10:48:29 2020
 
 # Load external libreries
 import json
+import os
 import requests
 from bs4 import BeautifulSoup  
 from selenium import webdriver
@@ -38,6 +39,10 @@ def create_dict(urls_dict, data_es, classes_es):
             d.close()
             print(aux)
         except:
+            try:
+                d.close()
+            except:
+                pass
             continue
         
     return urls_dict
@@ -97,10 +102,13 @@ def prensa_autonomica(save=False):
     
     urls_dict_autonomicas={}
     for url_autonomica in urls_autonomicas:
+        newspaper_name = url_autonomica.split('/')[-2]+'.json'
+        if os.path.isfile(newspaper_name):
+            continue
         urls_dict = retrieve_urls_index(url_autonomica)
         urls_dict_autonomicas[url_autonomica.split('/')[-2]]=urls_dict
         if save:        
-            f = open(url_autonomica.split('/')[-2]+'.json', 'w')
+            f = open(newspaper_name, 'w')
             json.dump(urls_dict, f)
             f.close()
             
