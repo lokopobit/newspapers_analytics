@@ -20,3 +20,5 @@ newsplease package datetime parser fails sometimes
 
 To increase webpages index urls extraction with selenium launch driver oonce and 
 create new tabs instead of launching-clsing driver for each url.
+
+main() function of get_news.py script can be optimized by merging cleaning() and insert2mong() functions at os.listdir/scandir level
