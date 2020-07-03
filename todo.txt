@@ -1,4 +1,5 @@
 similarity measures between titulares texto (como para comprobar plagios)
+search for huelva.es alcaldes in newspapers
 cuantas veces aparecen las personas, las cosas en general.
 analisis de sentimiento de las imagenes (politicos...)
 comparacion entre las imagenes de una misma noticia.
@@ -22,3 +23,6 @@ To increase webpages index urls extraction with selenium launch driver oonce and
 create new tabs instead of launching-clsing driver for each url.
 
 main() function of get_news.py script can be optimized by merging cleaning() and insert2mong() functions at os.listdir/scandir level
+
+C:\Users\juan\AppData\Local\Continuum\anaconda3\Lib\site-packages\newsplease\helper_classes\
+commit-push newsplease library modified scripts: parse_crawler
