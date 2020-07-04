@@ -6,7 +6,7 @@ Created on Tue Jun 30 12:11:55 2020
 """
 
 from multiprocessing import Pool, Lock
-import hjson
+import hjson, json
 from time import sleep
 import configparser
 import os
@@ -43,10 +43,24 @@ def init_child(lock_):
  
 #
 def multiprocess(n_pools):
+    
+    def create_newsp_urls_dict(urls):
+        f = open('already_cleaned.json', 'r') ; already_cleaned = json.load(f) ; f.close()
+        for url in urls:
+            for key_ in already_cleaned.keys():
+                if url.find(key_) != -1:
+                    already_urls = already_cleaned[key_]['urls']
+                    break
+            f = open(key_+'.json', 'w')
+            json.dump({key_:already_urls}, f)
+            f.close()
+        
     lock = Lock()
     p = Pool(n_pools, initializer=init_child, initargs=(lock,))
     # p.starmap(ca, [(3,4), (1,3)])
     urls = ['https://www.diariodehuelva.es/', 'https://www.huelvabuenasnoticias.com/', 'http://huelva24.com/']
-    urls = ['https://huelvaya.es/', 'https://www.huelvainformacion.es/', 'http://www.huelvahoy.com/']
+    # urls = ['https://huelvaya.es/', 'https://www.huelvainformacion.es/', 'http://www.huelvahoy.com/']
+    urls = ['https://huelvaya.es/', 'https://www.huelvainformacion.es/']
+    create_newsp_urls_dict(urls)
     p.map(execute_newsplease_cli, urls)
 
