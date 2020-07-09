@@ -8,12 +8,12 @@ Created on Tue Jun 30 12:11:55 2020
 from multiprocessing import Pool, Lock
 import hjson, json
 from time import sleep
+from datetime import datetime
 import subprocess
 import psutil
 import configparser
 import os
 
-procs_pid = []
 #    
 def execute_newsplease_cli(newspaper_url):
     # global procs_pid
@@ -22,7 +22,7 @@ def execute_newsplease_cli(newspaper_url):
     news_config = 'sitelist.hjson'
     
     with lock:
-        sleep(10)
+        sleep(20)
         f = open(os.path.join(config_path, news_config), 'r')
         nc = hjson.load(f)
         nc['base_urls'][0]['url'] = newspaper_url
@@ -34,17 +34,15 @@ def execute_newsplease_cli(newspaper_url):
         
         config = configparser.RawConfigParser()
         config.read(os.path.join(config_path,general_config))
-        config.set('Scrapy', 'JOBDIRNAME', 'jobdir'+newspaper_url.split('.')[1])
+        config.set('Scrapy', 'JOBDIRNAME', 'jobdir'+newspaper_url.split('.')[1]+str(datetime.today()).replace(':','-'))
         with open(os.path.join(config_path,general_config), 'w') as configfile:
             config.write(configfile)
         
     # os.system('cmd /k "news-please"')
-    proc=subprocess.Popen(['news-please'], stdout=subprocess.PIPE, shell=False)
+    proc=subprocess.Popen(['news-please'], shell=False)
     f = open('prueba.txt', 'a')
     f.write('\n '+str(proc.pid))
     f.close()
-    procs_pid.append(proc.pid)
-    print(procs_pid)
 
 #        
 def init_child(lock_):
@@ -74,23 +72,35 @@ def multiprocess(n_pools):
     lock = Lock()
     p = Pool(n_pools, initializer=init_child, initargs=(lock,))
     # p.starmap(ca, [(3,4), (1,3)])
-    # urls = ['https://www.diariodehuelva.es/', 'https://www.huelvabuenasnoticias.com/', 'http://huelva24.com/']
-    urls = ['https://huelvaya.es/', 'https://www.huelvainformacion.es/', 'http://www.huelvahoy.com/']
-    # urls = ['https://huelvaya.es/', 'https://www.huelvainformacion.es/']
-    create_newsp_urls_dict(urls)
-    p.map(execute_newsplease_cli, urls)
-    f = open('prueba.txt', 'r')
-    procs_pid = f.readlines()
-    f.close()
-    aux=[]
-    for ax in procs_pid:
-        try:
-            aux.append(int(ax.replace('\n', ' ')))
-        except:
+    all_urls = ['https://www.diariodehuelva.es/', 'https://www.huelvabuenasnoticias.com/', 'http://huelva24.com/',
+            'https://huelvaya.es/', 'https://www.huelvainformacion.es/', 'http://www.huelvahoy.com/']
+    
+    n_min = 5
+    range_ = list(range(0,len(all_urls)+1,n_pools))
+    for i in range(len(range_)):
+        if range_[i] == len(all_urls):
             continue
-
-    for proc_pid in aux: kill(proc_pid)
-    # os.remove('prueba.txt')
+        urls = all_urls[range_[i]:range_[i+1]]
+        create_newsp_urls_dict(urls)
+        p.map(execute_newsplease_cli, urls)
+        sleep(60*n_min)
+        f = open('prueba.txt', 'r')
+        procs_pid = f.readlines()
+        f.close()
+        aux=[]
+        for ax in procs_pid:
+            try:
+                aux.append(int(ax.replace('\n', ' ')))
+            except:
+                continue
+    
+        for proc_pid in aux: 
+            try:
+                kill(proc_pid)
+            except:
+                continue
+            
+        os.remove('prueba.txt')
 
 
 
