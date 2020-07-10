@@ -229,12 +229,13 @@ def mongoQueries():
     db_name = 'newsHuelva'
     client = create_mongo_client()
     db = open_mongo_db(client, db_name)
-    collection = db.list_collection_names()[3]
-    newsp = db[collection]
-    print('\n Newspaper:', collection)
-    print('\n Number of articles:', newsp.estimated_document_count()) 
-    print('\n Authors:', unique_authors(newsp))
-    print('\n No duplicated articles:', duplicated_articles(newsp))    
+    for i in range(len(db.list_collection_names())):
+        collection = db.list_collection_names()[i]
+        newsp = db[collection]
+        print('\n Newspaper:', collection)
+        print('\n Number of articles:', newsp.estimated_document_count()) 
+        print('\n Authors:', unique_authors(newsp))
+        print('\n No duplicated articles:', duplicated_articles(newsp))    
 
     
     a=newsp.find({'title':{'$eq':'Huelva, líder regional del sector apícola'}})
@@ -271,8 +272,6 @@ def mongoQueries():
    
 # newsp.create_index([("title", 'text')])
     
-    
-
     
 
      
