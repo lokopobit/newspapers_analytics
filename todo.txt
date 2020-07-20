@@ -11,6 +11,7 @@ news tracking -> news cronologhy
 analisis de noticias estacional: en verano, navidad, semana santa, ...
 5W1H
 GDELT Project 
+Related news to a selected one in one province, newspaper, country...
 
 already_cleaned and already_stored jsons must be improved with a path length (for example) so that 
 crawles of the same day are not duplicated in the mongodb
