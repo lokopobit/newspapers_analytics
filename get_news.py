@@ -185,119 +185,34 @@ def main():
         insert2mongo(data_path,newsp_paths_dict)
         
 
-#
-def mongoQueries():
-    
-    def unique_authors(newsp):
-        aux = []
-        for art in newsp.find():
-            aux.extend(art['authors'])
-        a = np.unique(aux)
-        return a
-    
-    def duplicated_articles(newsp):
-        a=newsp.find()
-        aux=[]
-        for aa in a:
-            aux.append(aa['url'])        
-        return len(aux) == len(np.unique(aux))
-    
-    def create_mongo_client(open_server=False):
-        print('-'*30)
-        print('Opening mongo db client')
-        print('-'*30)
-        if open_server:
-            shell.ShellExecuteEx(lpVerb='runas', lpFile='cmd.exe', lpParameters='/c '+'net start MongoDB')    
-        client = MongoClient()   
-        return client
-    
-    def open_mongo_db(client, db_name): 
-        print('-'*30)
-        print('Opening db:', db_name)
-        print('-'*30)
-        db = client[db_name]
-        return db
-        
-    def close_mongo_db(client, close_server=False):
-        print('-'*30)
-        print('Closing mongo db client')
-        print('-'*30)
-        client.close()
-        if close_server:
-            shell.ShellExecuteEx(lpVerb='runas', lpFile='cmd.exe', lpParameters='/c '+'net stop MongoDB')    
-     
-    db_name = 'newsHuelva'
-    client = create_mongo_client()
-    db = open_mongo_db(client, db_name)
-    for i in range(len(db.list_collection_names())):
-        collection = db.list_collection_names()[i]
-        newsp = db[collection]
-        print('\n Newspaper:', collection)
-        print('\n Number of articles:', newsp.estimated_document_count()) 
-        print('\n Authors:', unique_authors(newsp))
-        print('\n No duplicated articles:', duplicated_articles(newsp))    
 
-    
-    a=newsp.find({'title':{'$eq':'Huelva, líder regional del sector apícola'}})
-    for aa in newsp.find({'$text':{'$search':'cortegana', '$language' : "es"}}):
-        print('-'*40)
-        print(aa['title'])
-    
-    aux = []
-    for art in newsp.find({'authors':'Ignacio Garzón González'}):
-        print(art['authors'])
-        aux.append(art['description'])
-    for aa in a:
-        b=newsp.find({'authors':aa})
-        print(aa, b.count())
-    
-    close_mongo_db(client)
-    
-    
-    
-# a=newsp.find()
-# for aa in a:
-#     print(aa)
-    
-# a=newsp.find({'url':'http://huelva24.com/art/70727/rafael-segovia-ldquo-a-los-onubenses-poder-decir-que-somos-andaluces-nos-sale-muy-caro-rdquo-'})
-# for aa in a:
-#     # print('*'*90)
-#     print(aa['description'])  
-    
-# client.drop_database('newsHuelva')
-    
-# [item for item, count in collections.Counter(a).items() if count > 1]
-    
-# newsp.find_one()
-   
-# newsp.create_index([("title", 'text')])
     
     
 
      
-#
-def find_article_years(path):
-    years = []
-    for file in os.listdir(path):
-        if file[-5:] == '.json':
-            f = open(os.path.join(path, file), 'r')
-            art = json.load(f)
-            f.close()
-            years.append(int(art['date_publish'][:4]))
-    return years    
+# #
+# def find_article_years(path):
+#     years = []
+#     for file in os.listdir(path):
+#         if file[-5:] == '.json':
+#             f = open(os.path.join(path, file), 'r')
+#             art = json.load(f)
+#             f.close()
+#             years.append(int(art['date_publish'][:4]))
+#     return years    
 
    
-#
-def split_folder(): 
-    pre = r'C:\Users\juan\news-please-repo\data\2020\06\06'
-    for i in range(10):
-        new_folder = os.path.join(pre, '_'+str(i))
-        if not os.path.exists(new_folder):
-            os.mkdir(new_folder)
+# #
+# def split_folder(): 
+#     pre = r'C:\Users\juan\news-please-repo\data\2020\06\06'
+#     for i in range(10):
+#         new_folder = os.path.join(pre, '_'+str(i))
+#         if not os.path.exists(new_folder):
+#             os.mkdir(new_folder)
          
-        j = 0
-        while j < 200:
-            if i != 9:
-                pass
-            else:
-                pass
+#         j = 0
+#         while j < 200:
+#             if i != 9:
+#                 pass
+#             else:
+#                 pass
