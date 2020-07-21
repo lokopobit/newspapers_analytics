@@ -9,7 +9,6 @@ Created on Sat May 23 16:55:43 2020
 from pymongo import MongoClient
 import win32com.shell.shell as shell
 import os, json
-import numpy as np
 
 #
 def fast_dir_walking(data_path):
@@ -32,8 +31,8 @@ def fast_dir_walking(data_path):
 #
 def cleaning(data_path, newsp_paths_dict):
     
-    def cleaning_aux(newsp_path, urls, test=False):
-        data_path = r'C:\Users\juan\news-please-repo\data'
+    def cleaning_aux(data_path, newsp_path, urls, test=False):
+        # data_path = r'C:\Users\juan\news-please-repo\data'
         base = ['authors', 'date_download', 'date_modify', 'date_publish', 'description', 
                 'filename', 'image_url', 'language', 'localpath', 'title', 'title_page', 
                 'title_rss', 'source_domain', 'maintext', 'url']
@@ -73,7 +72,7 @@ def cleaning(data_path, newsp_paths_dict):
         for ef in error_files: os.remove(os.path.join(newsp_path, ef))
     
     
-    f = open('already_cleaned.json', 'r') ; already_cleaned = json.load(f) ; f.close()   
+    f = open('json_data/already_cleaned.json', 'r') ; already_cleaned = json.load(f) ; f.close()   
     # Newspaaper cleaning
     for newsp_key in newsp_paths_dict.keys():
         print('-'*20)
@@ -91,14 +90,14 @@ def cleaning(data_path, newsp_paths_dict):
                 continue
             
             urls_ = already_cleaned[newsp_key]['urls']
-            error_files, different_files, urls = cleaning_aux(newsp_path, urls_, test=False)
+            error_files, different_files, urls = cleaning_aux(data_path, newsp_path, urls_, test=False)
             already_cleaned[newsp_key]['urls'] = urls
             
             remove_error_files(newsp_path, error_files)
             already_cleaned[newsp_key]['paths'].append(newsp_path)
             print(newsp_path.replace(data_path, ''), 'Cleaned.', 'Removed ', len(error_files), ' files')
         
-            f = open('already_cleaned.json', 'w') ; json.dump(already_cleaned,f) ; f.close()    
+            f = open('json_data/already_cleaned.json', 'w') ; json.dump(already_cleaned,f) ; f.close()    
 
 
 #
@@ -134,7 +133,7 @@ def insert2mongo(data_path, newsp_paths_dict):
     # db.list_collection_names()
     # collection = db.test_collection
     
-    f = open('already_stored.json', 'r') ; already_stored = json.load(f) ; f.close()
+    f = open('json_data/already_stored.json', 'r') ; already_stored = json.load(f) ; f.close()
     # Newspaaper cleaning
     for newsp_key in newsp_paths_dict.keys():
         print('-'*20)
@@ -161,33 +160,10 @@ def insert2mongo(data_path, newsp_paths_dict):
             already_stored[newsp_key].append(newsp_path)
             print(newsp_path.replace(data_path, ''), 'Inserted.')
         
-            f = open('already_stored.json', 'w') ; json.dump(already_stored,f) ; f.close()    
+            f = open('json_data/already_stored.json', 'w') ; json.dump(already_stored,f) ; f.close()    
     
     close_mongo_db(client)
 
-
-#
-def main():
-    mongo_store = True
-    
-    print('*'*50)
-    print('Step 1: Cleaning')
-    print('*'*50)
-    data_path = r'C:\Users\juan\news-please-repo\data'
-    newsp_paths_dict = fast_dir_walking(data_path)
-    cleaning(data_path, newsp_paths_dict)
-        
-    if mongo_store:
-        print('*'*50)
-        print('Step 2: Inserting in mongodb')
-        print('*'*50)
-        
-        insert2mongo(data_path,newsp_paths_dict)
-        
-
-
-    
-    
 
      
 # #
