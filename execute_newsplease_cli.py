@@ -54,7 +54,7 @@ def init_child(lock_):
     lock = lock_
  
 #
-def multiprocess(n_pools):
+def multiprocess(n_pools, n_min):
 
     def kill(proc_pid):
         process = psutil.Process(proc_pid)
@@ -72,6 +72,10 @@ def multiprocess(n_pools):
             f = open('json_data/' + key_+'.json', 'w')
             json.dump({key_:already_urls}, f)
             f.close()
+            
+    def load_n_per_province():
+        
+        return urls
        
     lock = Lock()
     p = Pool(n_pools, initializer=init_child, initargs=(lock,))
@@ -79,7 +83,6 @@ def multiprocess(n_pools):
     all_urls = ['https://www.diariodehuelva.es/', 'https://www.huelvabuenasnoticias.com/', 'http://huelva24.com/',
             'https://huelvaya.es/', 'https://www.huelvainformacion.es/', 'http://www.huelvahoy.com/']
     
-    n_min = 5
     range_ = list(range(0,len(all_urls)+1,n_pools))
     for i in range(len(range_)):
         if range_[i] == len(all_urls):

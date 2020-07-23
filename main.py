@@ -11,16 +11,17 @@ import execute_newsplease_cli
 
 # Scrape data 
 n_pools = 3
-execute_newsplease_cli.multiprocess(n_pools)
+n_min = 5
+execute_newsplease_cli.multiprocess(n_pools, n_min)
 
 
 # Data cleaning and storing
-mongo_store = True
+mongo_store = False
 
 print('*'*50)
 print('Step 1: Cleaning')
 print('*'*50)
-data_path = pd.read_csv('configs_path.csv')['data_path'].tolist()[0]
+data_path = pd.read_csv('configs_path.csv')['bbdd_path'].tolist()[0]
 newsp_paths_dict = get_news.fast_dir_walking(data_path)
 get_news.cleaning(data_path, newsp_paths_dict)
     
