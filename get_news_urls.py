@@ -6,6 +6,8 @@ Created on Sun May 24 10:48:29 2020
 """
 
 # Load external libreries
+import pandas as pd
+import unicodedata
 import json
 import os
 import requests
@@ -17,7 +19,8 @@ def start_url_driver(url):
     try:
         options = Options()
         options.headless = True
-        driver = webdriver.Firefox(executable_path=r'C:\Users\juan\Documents\geckodriver-v0.26.0-win64\geckodriver.exe', options=options)
+        geckodriver_path = pd.read_csv('configs_path.csv')['geckodriver_path'].tolist()[0]
+        driver = webdriver.Firefox(executable_path=geckodriver_path, options=options)
         driver.implicitly_wait(10)
         driver.get(url)
         return driver
@@ -116,7 +119,54 @@ def prensa_autonomica(save=False):
     
     
 # urls_dict = prensa_es()     
-   
+def remove_accents_prensa():
+    
+    def apply_encoding(key_):
+        
+        def remove_accents(input_str):
+            nfkd_form = unicodedata.normalize('NFKD', input_str)
+            only_ascii = nfkd_form.encode('ASCII', 'ignore')
+            return only_ascii
+        
+        new_key = key_.upper().encode("latin1").decode().title()
+        new_key = remove_accents(new_key)
+        new_key = new_key.decode('utf-8').replace(' ', '_')          
+        return new_key
+    
+    prensas = os.listdir('json_data')
+    prensas = [pr for pr in prensas if pr[:7] == 'prensa_']
+    
+    for prensa in prensas[1:]:
+        f = open(os.path.join('json_data', prensa), 'r')
+        prensa_dict = json.load(f)
+        f.close()
+        
+        prensa_dict_new = {}
+        for key_ in prensa_dict.keys():
+            if prensa_dict[key_] == []:
+                continue
+
+            new_key = apply_encoding(key_)
+            
+            if new_key == 'Incluye_Mas_Medios_Escribiendo_A_Directorios@Tnrelaciones.Com':
+                new_key = 'General'
+            
+            prensa_dict_new[new_key] = prensa_dict[key_]
+            
+            press_url_new = []
+            for press_url in prensa_dict_new[new_key]:
+                press_url0 = press_url.split('_')[0]
+                press_url1 = press_url.split('_')[1]
+                press_url0 = apply_encoding(press_url0)
+                press_url = press_url0 + '_' + press_url1
+                press_url_new.append(press_url)
+                
+            prensa_dict_new[new_key] = press_url_new   
+            
+        f = open(os.path.join('json_data', prensa), 'w')
+        json.dump(prensa_dict_new,f)
+        f.close()
+        
 
 
 
