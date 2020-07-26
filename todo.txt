@@ -31,3 +31,5 @@ commit-push newsplease library modified scripts: parse_crawler
 
 Included code lines in parse_crawler.py to avoid re-downloading are not properly placed. They are now placed in the spider
 url extraction of html but must be placed rigth before saving the json and html of that article.
+
+collections names must be community+province
