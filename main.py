@@ -9,26 +9,27 @@ import pandas as pd
 import get_news
 import execute_newsplease_cli
 
-# Scrape data 
-n_pools = 3
-n_min = 5
-execute_newsplease_cli.multiprocess(n_pools, n_min)
-
-
-# Data cleaning and storing
-mongo_store = False
-
-print('*'*50)
-print('Step 1: Cleaning')
-print('*'*50)
-data_path = pd.read_csv('configs_path.csv')['bbdd_path'].tolist()[0]
-newsp_paths_dict = get_news.fast_dir_walking(data_path)
-get_news.cleaning(data_path, newsp_paths_dict)
+if __name__ ==  '__main__':
+    # Scrape data 
+    n_pools = 3
+    n_min = 5
+    execute_newsplease_cli.multiprocess(n_pools, n_min)
     
-if mongo_store:
-    print('*'*50)
-    print('Step 2: Inserting in mongodb')
-    print('*'*50)
     
-    get_news.insert2mongo(data_path,newsp_paths_dict)
+    # Data cleaning and storing
+    mongo_store = False
+    
+    print('*'*50)
+    print('Step 1: Cleaning')
+    print('*'*50)
+    data_path = pd.read_csv('configs_path.csv')['bbdd_path'].tolist()[0]
+    newsp_paths_dict = get_news.fast_dir_walking(data_path)
+    get_news.cleaning(data_path, newsp_paths_dict)
+        
+    if mongo_store:
+        print('*'*50)
+        print('Step 2: Inserting in mongodb')
+        print('*'*50)
+        
+        get_news.insert2mongo(data_path,newsp_paths_dict)
 

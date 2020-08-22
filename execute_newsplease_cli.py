@@ -21,8 +21,8 @@ def execute_newsplease_cli(newspaper_url):
     # config_path = pd.read_csv('configs_path.csv')['config_path'].tolist()[0]
     # general_config = 'config.cfg'
     # news_config = 'sitelist.hjson'
-    
-    with lock:
+
+    with lock:        
         sleep(20)
         config_path = pd.read_csv('configs_path.csv')['config_path'].tolist()[0]
         general_config = 'config.cfg'
@@ -30,7 +30,6 @@ def execute_newsplease_cli(newspaper_url):
         f = open(os.path.join(config_path, news_config), 'r')
         nc = hjson.load(f)
         nc['base_urls'][0]['url'] = newspaper_url
-        f.close()
         
         f = open(os.path.join(config_path, news_config), 'w')
         hjson.dump(nc, f)
@@ -42,7 +41,7 @@ def execute_newsplease_cli(newspaper_url):
         with open(os.path.join(config_path,general_config), 'w') as configfile:
             config.write(configfile)
         
-    # os.system('cmd /k "news-please"')
+    os.system('cmd /k "news-please"')
     proc=subprocess.Popen(['news-please'], shell=False)
     f = open('json_data/process_PIDs.txt', 'a')
     f.write('\n '+str(proc.pid))
@@ -90,6 +89,7 @@ def multiprocess(n_pools, n_min):
         
         urls = all_urls[range_[i]:range_[i+1]]
         create_newsp_urls_dict(urls)
+        print(urls)
         p.map(execute_newsplease_cli, urls)
         
         sleep(60*n_min)
@@ -111,9 +111,3 @@ def multiprocess(n_pools, n_min):
                 continue
             
         os.remove('json_data/process_PIDs.txt')
-
-
-
-
-
-
