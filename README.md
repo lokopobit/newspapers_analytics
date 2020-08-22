@@ -12,6 +12,6 @@ In biref, a Spain's newspapers analytics toolbox. For now, the codes developed c
 
 
 
-
+Create environment variable named "newspapers_analytics_path" witrh value that of the absolute repo path.
 
 Requirements.
