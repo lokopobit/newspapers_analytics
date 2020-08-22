@@ -41,7 +41,7 @@ def execute_newsplease_cli(newspaper_url):
         with open(os.path.join(config_path,general_config), 'w') as configfile:
             config.write(configfile)
         
-    os.system('cmd /k "news-please"')
+    # os.system('cmd /k "news-please"')
     proc=subprocess.Popen(['news-please'], shell=False)
     f = open('json_data/process_PIDs.txt', 'a')
     f.write('\n '+str(proc.pid))
