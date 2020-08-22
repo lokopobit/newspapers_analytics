@@ -5,6 +5,7 @@ import logging
 import re
 import time
 import json, hjson, os
+import pandas as pd
 
 import scrapy
 
@@ -13,15 +14,16 @@ from ..crawler.items import NewscrawlerItem
 # to improve performance, regex statements are compiled only once per module
 re_html = re.compile('text/html')
 
-f = open(r'C:\Users\juan\Desktop\newspapers_analytics\json_data\already_cleaned.json', 'r') ; already_cleaned = json.load(f) ; f.close()
-config_path = r'C:\Users\juan\news-please-repo\config'
+repo_folder_path = os.getenv('newspapers_analytics_path')
+f = open(os.path.join(repo_folder_path,'json_data\\already_cleaned.json'), 'r') ; already_cleaned = json.load(f) ; f.close()
+config_path = pd.read_csv(os.path.join(repo_folder_path,'configs_path.csv'))['config_path'].tolist()[0]
 f = open(os.path.join(config_path, 'sitelist.hjson'), 'r')
 nc = hjson.load(f)
 newspaper_url=nc['base_urls'][0]['url']
 f.close()
 for key_ in already_cleaned.keys():
     if newspaper_url.find(key_) != -1:
-        f = open('C:\\Users\\juan\\Desktop\\newspapers_analytics\\json_data\\'+key_+'.json', 'r')
+        f = open(repo_folder_path+'\\json_data\\'+key_+'.json', 'r')
         already_urls = json.load(f)
         already_urls = already_urls[key_]
         f.close()
