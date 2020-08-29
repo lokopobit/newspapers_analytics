@@ -136,7 +136,7 @@ def remove_accents_prensa():
     prensas = os.listdir('json_data')
     prensas = [pr for pr in prensas if pr[:7] == 'prensa_']
     
-    for prensa in prensas[1:]:
+    for prensa in prensas:
         f = open(os.path.join('json_data', prensa), 'r')
         prensa_dict = json.load(f)
         f.close()
@@ -168,6 +168,25 @@ def remove_accents_prensa():
         f.close()
         
 
-
+def create_prensas_all():
+    prensas = os.listdir('json_data')
+    prensas = [pr for pr in prensas if pr[:7] == 'prensa_']
+    
+    prensas_all={}
+    for prensa in prensas:
+        f = open(os.path.join('json_data', prensa), 'r')
+        prensa_dict = json.load(f)
+        f.close()
+        
+        comunidad = prensa.split('.')[0].split('_')[-1] 
+        for key_ in prensa_dict.keys():
+            prensas_all_key = comunidad+'_'+key_
+            prensas_all[prensas_all_key] = prensa_dict[key_]
+        
+    f = open('json_data/prensas_all.json', 'w')
+    json.dump(prensas_all,f)
+    f.close()    
+        
+    return prensas_all
 
 
