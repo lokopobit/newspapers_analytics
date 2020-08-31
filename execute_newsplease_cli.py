@@ -72,7 +72,8 @@ def multiprocess(n_pools, n_min):
             json.dump({key_:already_urls}, f)
             f.close()
             
-    def load_n_per_province():
+    def load_n_per_province(n_pools):
+        f = open('json_data/prensa_all.json', 'r') ; prensa_all = json.load(f) ; f.close()
         
         return urls
        
