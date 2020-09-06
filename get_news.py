@@ -128,41 +128,56 @@ def insert2mongo(data_path, newsp_paths_dict):
             shell.ShellExecuteEx(lpVerb='runas', lpFile='cmd.exe', lpParameters='/c '+'net stop MongoDB')
            
     db_name = 'newsHuelva'
-    client = create_mongo_client()
-    db = open_mongo_db(client, db_name)
-    # db.list_collection_names()
-    # collection = db.test_collection
+    f = open('json_data/prensas_all.json', 'r') ; prensa_all = json.load(f) ; f.close()
+    db_names = []
+    for key_, values in prensa_all.items():  
+        if key_.find('eportivos') != -1 or key_.find('eneral') != -1:
+            continue
+        for newsp_key in newsp_paths_dict.keys():
+            aux = [val for val in values if val.find(newsp_key) != -1]
+            if aux != []:
+                print(key_, newsp_key)
+                db_names.append(key_)
     
-    f = open('json_data/already_stored.json', 'r') ; already_stored = json.load(f) ; f.close()
-    # Newspaaper cleaning
-    for newsp_key in newsp_paths_dict.keys():
-        print('-'*20)
-        print('Inserting', newsp_key)
-        print('-'*20)
-        collection = db[newsp_key]
-        for newsp_path in newsp_paths_dict[newsp_key]:
-            
-            if newsp_key not in already_stored.keys():
-                already_stored[newsp_key] = []
-                
-            if newsp_path in already_stored[newsp_key]:
-                print(newsp_path.replace(data_path, ''), 'Already inserted')
-                continue
-            
-            for file in os.listdir(newsp_path):
-                if file[-5:] == '.json':
-                    f = open(os.path.join(newsp_path, file), 'r')
-                    art = json.load(f)
-                    f.close()
-                    collection.insert_one(art)  
-                    # collection.update(art, art, upsert=True)
-            
-            already_stored[newsp_key].append(newsp_path)
-            print(newsp_path.replace(data_path, ''), 'Inserted.')
+    for db_name in db_names:
+        client = create_mongo_client()
+        db = open_mongo_db(client, db_name)
+        # db.list_collection_names()
+        # collection = db.test_collection
         
-            f = open('json_data/already_stored.json', 'w') ; json.dump(already_stored,f) ; f.close()    
-    
-    close_mongo_db(client)
+        f = open('json_data/already_stored.json', 'r') ; already_stored = json.load(f) ; f.close()
+        # Newspaaper cleaning
+        for newsp_key in newsp_paths_dict.keys():
+            aux = [val for val in prensa_all[db_name] if val.find(newsp_key) != -1] 
+            if aux == []:
+                continue
+            print('-'*20)
+            print('Inserting', newsp_key)
+            print('-'*20)
+            collection = db[newsp_key]
+            for newsp_path in newsp_paths_dict[newsp_key]:
+                
+                if newsp_key not in already_stored.keys():
+                    already_stored[newsp_key] = []
+                    
+                if newsp_path in already_stored[newsp_key]:
+                    print(newsp_path.replace(data_path, ''), 'Already inserted')
+                    continue
+                
+                for file in os.listdir(newsp_path):
+                    if file[-5:] == '.json':
+                        f = open(os.path.join(newsp_path, file), 'r')
+                        art = json.load(f)
+                        f.close()
+                        collection.insert_one(art)  
+                        # collection.update(art, art, upsert=True)
+                
+                already_stored[newsp_key].append(newsp_path)
+                print(newsp_path.replace(data_path, ''), 'Inserted.')
+            
+                f = open('json_data/already_stored.json', 'w') ; json.dump(already_stored,f) ; f.close()    
+        
+        close_mongo_db(client)
 
 
      

@@ -14,6 +14,9 @@ import subprocess
 import psutil
 import configparser
 import os
+from random import sample
+from operator import itemgetter 
+
 
 #    
 def execute_newsplease_cli(newspaper_url):
@@ -73,9 +76,15 @@ def multiprocess(n_pools, n_min):
             f.close()
             
     def load_n_per_province(n_pools):
-        f = open('json_data/prensa_all.json', 'r') ; prensa_all = json.load(f) ; f.close()
-        
-        return urls
+        f = open('json_data/prensas_all.json', 'r') ; prensa_all = json.load(f) ; f.close()
+        all_urls = []
+        for key_ in prensa_all.keys():    
+            if len(prensa_all[key_]) < n_pools:
+                continue           
+            npools_random_int = sample(range(len(prensa_all[key_])),n_pools)            
+            urls = itemgetter(*npools_random_int)(prensa_all[key_])
+            all_urls.extend(list(urls))
+        return all_urls
        
     lock = Lock()
     p = Pool(n_pools, initializer=init_child, initargs=(lock,))
