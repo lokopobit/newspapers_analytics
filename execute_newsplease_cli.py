@@ -70,10 +70,13 @@ def multiprocess(n_pools, n_min):
             for key_ in already_cleaned.keys():
                 if url.find(key_) != -1:
                     already_urls = already_cleaned[key_]['urls']
-                    break
-            f = open('json_data/' + key_+'.json', 'w')
-            json.dump({key_:already_urls}, f)
-            f.close()
+                    break                
+            try:
+                f = open('json_data/' + key_+'.json', 'w')
+                json.dump({key_:already_urls}, f)
+                f.close()
+            except:
+                pass
             
     def load_n_per_province(n_pools):
         f = open('json_data/prensas_all.json', 'r') ; prensa_all = json.load(f) ; f.close()
@@ -84,13 +87,16 @@ def multiprocess(n_pools, n_min):
             npools_random_int = sample(range(len(prensa_all[key_])),n_pools)            
             urls = itemgetter(*npools_random_int)(prensa_all[key_])
             all_urls.extend(list(urls))
+        all_urls = [au.split('_')[-1] for au in all_urls]
         return all_urls
        
     lock = Lock()
     p = Pool(n_pools, initializer=init_child, initargs=(lock,))
     # p.starmap(ca, [(3,4), (1,3)])
-    all_urls = ['https://www.diariodehuelva.es/', 'https://www.huelvabuenasnoticias.com/', 'http://huelva24.com/',
-            'https://huelvaya.es/', 'https://www.huelvainformacion.es/', 'http://www.huelvahoy.com/']
+    # all_urls = ['https://www.diariodehuelva.es/', 'https://www.huelvabuenasnoticias.com/', 'http://huelva24.com/',
+    #         'https://huelvaya.es/', 'https://www.huelvainformacion.es/', 'http://www.huelvahoy.com/']
+    
+    all_urls = load_n_per_province(n_pools)
     
     range_ = list(range(0,len(all_urls)+1,n_pools))
     for i in range(len(range_)):

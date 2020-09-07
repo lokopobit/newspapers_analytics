@@ -155,8 +155,8 @@ def remove_accents_prensa():
             
             press_url_new = []
             for press_url in prensa_dict_new[new_key]:
-                press_url0 = press_url.split('_')[0]
-                press_url1 = press_url.split('_')[1]
+                press_url0 = '_'.join(press_url.split('_')[:-1])
+                press_url1 = press_url.split('_')[-1]
                 press_url0 = apply_encoding(press_url0)
                 press_url = press_url0 + '_' + press_url1
                 press_url_new.append(press_url)
@@ -171,6 +171,7 @@ def remove_accents_prensa():
 def create_prensas_all():
     prensas = os.listdir('json_data')
     prensas = [pr for pr in prensas if pr[:7] == 'prensa_']
+    prensas.remove('prensa_espannola.json')
     
     prensas_all={}
     for prensa in prensas:

@@ -127,7 +127,6 @@ def insert2mongo(data_path, newsp_paths_dict):
         if close_server:
             shell.ShellExecuteEx(lpVerb='runas', lpFile='cmd.exe', lpParameters='/c '+'net stop MongoDB')
            
-    db_name = 'newsHuelva'
     f = open('json_data/prensas_all.json', 'r') ; prensa_all = json.load(f) ; f.close()
     db_names = []
     for key_, values in prensa_all.items():  

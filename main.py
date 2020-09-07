@@ -9,16 +9,18 @@ import pandas as pd
 import get_news
 import execute_newsplease_cli
 
+execute_multiprocess = False
+mongo_store = False
 if __name__ ==  '__main__':
-    # Scrape data 
-    n_pools = 3
-    n_min = 5
-    execute_newsplease_cli.multiprocess(n_pools, n_min)
+    
+    if execute_multiprocess:
+        # Scrape data 
+        n_pools = 3
+        n_min = 5
+        execute_newsplease_cli.multiprocess(n_pools, n_min)
     
     
-    # Data cleaning and storing
-    mongo_store = False
-    
+    # Data cleaning and storing        
     print('*'*50)
     print('Step 1: Cleaning')
     print('*'*50)
