@@ -22,7 +22,7 @@ Another option to last paragraph problem is to store articles urls and avoid rec
 newsplease package datetime parser fails sometimes
 
 To increase webpages index urls extraction with selenium launch driver oonce and 
-create new tabs instead of launching-clsing driver for each url.
+create new tabs instead of launching-closing driver for each url.
 
 main() function of get_news.py script can be optimized by merging cleaning() and insert2mong() functions at os.listdir/scandir level
 
@@ -32,6 +32,5 @@ commit-push newsplease library modified scripts: parse_crawler
 Included code lines in parse_crawler.py to avoid re-downloading are not properly placed. They are now placed in the spider
 url extraction of html but must be placed rigth before saving the json and html of that article.
 
-collections names must be community+province
-
 elasticsearch database
+
