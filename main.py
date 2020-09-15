@@ -10,7 +10,7 @@ import get_news
 import execute_newsplease_cli
 
 execute_multiprocess = False
-mongo_store = False
+mongo_store = True
 if __name__ ==  '__main__':
     
     if execute_multiprocess:
