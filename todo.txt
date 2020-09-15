@@ -33,3 +33,5 @@ Included code lines in parse_crawler.py to avoid re-downloading are not properly
 url extraction of html but must be placed rigth before saving the json and html of that article.
 
 collections names must be community+province
+
+elasticsearch database
