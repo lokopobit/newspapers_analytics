@@ -34,3 +34,7 @@ url extraction of html but must be placed rigth before saving the json and html 
 
 elasticsearch database
 
+
+https://stackoverflow.com/questions/57189358/free-api-similar-to-google-translate-for-python
+https://canarduck.gitlab.io/systranio/
+https://www.prensaescrita.com/europa/turquia.php
