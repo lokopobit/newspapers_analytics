@@ -1,3 +1,18 @@
+### STEP 1: CRAWLING AND STORING ### 
+already_cleaned and already_stored jsons must be improved with a path length (for example) so that 
+crawles of the same day are not duplicated in the mongodb
+Another option to last paragraph problem is to store articles urls and avoid recrawling and remove duplicated recrawls.
+newsplease package datetime parser fails sometimes
+To increase webpages index urls extraction with selenium launch driver oonce and 
+create new tabs instead of launching-closing driver for each url.
+main() function of get_news.py script can be optimized by merging cleaning() and insert2mong() functions at os.listdir/scandir level
+Included code lines in parse_crawler.py to avoid re-downloading are not properly placed. They are now placed in the spider
+url extraction of html but must be placed rigth before saving the json and html of that article.
+elasticsearch database
+https://www.prensaescrita.com/europa/turquia.php
+
+
+### STEP 2: ANALYTICS ###
 similarity measures between titulares texto (como para comprobar plagios)
 search for huelva.es alcaldes in newspapers
 cuantas veces aparecen las personas, las cosas en general.
@@ -12,29 +27,21 @@ analisis de noticias estacional: en verano, navidad, semana santa, ...
 5W1H
 GDELT Project 
 Related news to a selected one in one province, newspaper, country...
+https://stackoverflow.com/questions/57189358/free-api-similar-to-google-translate-for-python
+https://canarduck.gitlab.io/systranio/
+
+
+### STEP 3: ###
 Twitter api
 
-already_cleaned and already_stored jsons must be improved with a path length (for example) so that 
-crawles of the same day are not duplicated in the mongodb
 
-Another option to last paragraph problem is to store articles urls and avoid recrawling and remove duplicated recrawls.
 
-newsplease package datetime parser fails sometimes
 
-To increase webpages index urls extraction with selenium launch driver oonce and 
-create new tabs instead of launching-closing driver for each url.
 
-main() function of get_news.py script can be optimized by merging cleaning() and insert2mong() functions at os.listdir/scandir level
+
+
+
 
 C:\Users\juan\AppData\Local\Continuum\anaconda3\Lib\site-packages\newsplease\helper_classes\
 commit-push newsplease library modified scripts: parse_crawler
 
-Included code lines in parse_crawler.py to avoid re-downloading are not properly placed. They are now placed in the spider
-url extraction of html but must be placed rigth before saving the json and html of that article.
-
-elasticsearch database
-
-
-https://stackoverflow.com/questions/57189358/free-api-similar-to-google-translate-for-python
-https://canarduck.gitlab.io/systranio/
-https://www.prensaescrita.com/europa/turquia.php
