@@ -10,6 +10,7 @@ Included code lines in parse_crawler.py to avoid re-downloading are not properly
 url extraction of html but must be placed rigth before saving the json and html of that article.
 elasticsearch database
 https://www.prensaescrita.com/europa/turquia.php
+Change variable names and file names (storing_and_cleaning)
 
 
 ### STEP 2: ANALYTICS ###
