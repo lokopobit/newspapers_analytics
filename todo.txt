@@ -33,6 +33,9 @@ GDELT Project
 Related news to a selected one in one province, newspaper, country...
 https://stackoverflow.com/questions/57189358/free-api-similar-to-google-translate-for-python
 https://canarduck.gitlab.io/systranio/
+NLP: keywords and summary
+Search for word: Dina, PSOE, ... frecuency of appearance
+Containment per newspaper, per province and per provinces
 
 
 ### STEP 3: ###
