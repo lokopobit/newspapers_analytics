@@ -6,9 +6,14 @@ Created on Sat May 23 16:55:43 2020
 """
 
 # Load external libreries
-from pymongo import MongoClient
-import win32com.shell.shell as shell
 import os, json
+from elasticsearch.helpers import parallel_bulk
+from collections import deque
+from tqdm import tqdm
+import time
+
+
+import auxiliar_functions as auxFuns
 
 #
 def fast_dir_walking(data_path):
@@ -101,32 +106,7 @@ def cleaning(data_path, newsp_paths_dict):
 
 
 #
-def insert2mongo(data_path, newsp_paths_dict):
-    def create_mongo_client(open_server=False):
-        print('-'*30)
-        print('Opening mongo db client')
-        print('-'*30)
-        if open_server:
-            # os.system('cmd /k "C:\\mongodb\\bin\\mongod.exe"') 
-            shell.ShellExecuteEx(lpVerb='runas', lpFile='cmd.exe', lpParameters='/c '+'net start MongoDB')    
-        client = MongoClient()   
-        return client
-    
-    def open_mongo_db(client, db_name): 
-        print('-'*30)
-        print('Opening db:', db_name)
-        print('-'*30)
-        db = client[db_name]
-        return db
-        
-    def close_mongo_db(client, close_server=False):
-        print('-'*30)
-        print('Closing mongo db client')
-        print('-'*30)
-        client.close()
-        if close_server:
-            shell.ShellExecuteEx(lpVerb='runas', lpFile='cmd.exe', lpParameters='/c '+'net stop MongoDB')
-           
+def insert2mongo(data_path, newsp_paths_dict):         
     f = open('json_data/prensas_all.json', 'r') ; prensa_all = json.load(f) ; f.close()
     db_names = []
     for key_, values in prensa_all.items():  
@@ -139,8 +119,8 @@ def insert2mongo(data_path, newsp_paths_dict):
                 db_names.append(key_)
     
     for db_name in db_names:
-        client = create_mongo_client()
-        db = open_mongo_db(client, db_name)
+        client = auxFuns.create_mongo_client()
+        db = auxFuns.open_mongo_db(client, db_name)
         # db.list_collection_names()
         # collection = db.test_collection
         
@@ -176,9 +156,57 @@ def insert2mongo(data_path, newsp_paths_dict):
             
                 f = open('json_data/already_stored.json', 'w') ; json.dump(already_stored,f) ; f.close()    
         
-        close_mongo_db(client)
+        auxFuns.close_mongo_db(client)
 
 
+def mongo_to_ES():
+    
+    if not os.path.exists('json/mongo_to_ES_dict.json'):
+        mongo_to_ES_dict = {}
+    else:
+        f = open('json/mongo_to_ES_dict.json', 'r')
+        mongo_to_ES_dict = json.load(f)
+        f.close()
+    
+    ES_client = auxFuns.create_ES_client()
+    MG_client = auxFuns.create_mongo_client()
+    
+    db_names_to_exclude = ['admin','config','local','newsHuelva']
+    all_db_names = MG_client.list_database_names()
+    for ax in db_names_to_exclude: all_db_names.remove(ax)
+    for db_name in all_db_names:
+        if db_name not in mongo_to_ES_dict.keys(): mongo_to_ES_dict[db_name] = {}
+        db = auxFuns.open_mongo_db(MG_client, db_name)
+        collections = db.list_collection_names()
+        for collection in collections:
+            if collection not in mongo_to_ES_dict[db_name].keys():
+                mongo_to_ES_dict[db_name][collection] = []
+            newsp = db[collection]
+    
+            actions = []
+            ES_index = (db_name+'_'+collection).lower()
+            for data in tqdm(newsp.find(), total=newsp.count()):
+                if str(data['_id']) in mongo_to_ES_dict[db_name][collection]:
+                    continue
+                else:
+                    mongo_to_ES_dict[db_name][collection].append(str(data['_id']))
+                
+                data.pop('_id')
+                action = {
+                    "_index": ES_index,
+                    "_type": 'string',
+                    "_source": data
+                }
+                actions.append(action)
+                
+                # Dump x number of objects at a time
+                if len(actions) >= 100:
+                    deque(parallel_bulk(ES_client, actions), maxlen=0)
+                    actions = []
+                time.sleep(.01)
+    f = open('json/mongo_to_ES_dict.json', 'w')
+    json.dump(mongo_to_ES_dict, f)
+    f.close()
      
 # #
 # def find_article_years(path):
