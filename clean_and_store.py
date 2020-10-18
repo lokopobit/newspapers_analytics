@@ -12,32 +12,14 @@ from collections import deque
 from tqdm import tqdm
 import time
 
-
-import auxiliar_functions as auxFuns
-
 #
-def fast_dir_walking(data_path):
-    dirs_dict = {}
-    year_dirs = [f.path for f in os.scandir(data_path) if f.is_dir()]
-    for year in year_dirs:
-        month_dirs = [f.path for f in os.scandir(year) if f.is_dir()]
-        for month in month_dirs:
-            day_dirs = [f.path for f in os.scandir(month) if f.is_dir()]
-            for day in day_dirs:
-                newsp_dirs = [f.path for f in os.scandir(day) if f.is_dir()]
-                for newsp in newsp_dirs:
-                    new_key = newsp.split('\\')[-1]
-                    if new_key not in dirs_dict.keys():
-                        dirs_dict[new_key] = []
-                    dirs_dict[new_key].append(newsp) # Remove data_path from newsp?
-    return dirs_dict
-                        
+import auxiliar_functions as auxFuns
+                      
     
 #
 def cleaning(data_path, newsp_paths_dict):
     
-    def cleaning_aux(data_path, newsp_path, urls, test=False):
-        # data_path = r'C:\Users\juan\news-please-repo\data'
+    def cleaning_newsp_path(data_path, newsp_path, urls, test=False):
         base = ['authors', 'date_download', 'date_modify', 'date_publish', 'description', 
                 'filename', 'image_url', 'language', 'localpath', 'title', 'title_page', 
                 'title_rss', 'source_domain', 'maintext', 'url']
@@ -67,10 +49,14 @@ def cleaning(data_path, newsp_paths_dict):
                     urls.append(art['url'])
                 
                 j += 1           
-                if test and j >10:          
-                    break           
+                if test and j >10: break           
                 if j % 10000 == 0:
-                    print(newsp_path.replace(data_path, ''), 'Files checked:', j)                                
+                    print(newsp_path.replace(data_path, ''), 'Files checked:', j)
+                    
+            elif file[-5:] == '.html':
+                error_files.append(file)
+
+                      
         return error_files, different_files, urls    
     
     def remove_error_files(newsp_path, error_files):
@@ -95,7 +81,7 @@ def cleaning(data_path, newsp_paths_dict):
                 continue
             
             urls_ = already_cleaned[newsp_key]['urls']
-            error_files, different_files, urls = cleaning_aux(data_path, newsp_path, urls_, test=False)
+            error_files, different_files, urls = cleaning_newsp_path(data_path, newsp_path, urls_, test=False)
             already_cleaned[newsp_key]['urls'] = urls
             
             remove_error_files(newsp_path, error_files)
@@ -161,10 +147,10 @@ def insert2mongo(data_path, newsp_paths_dict):
 
 def mongo_to_ES():
     
-    if not os.path.exists('json/mongo_to_ES_dict.json'):
+    if not os.path.exists('json_data/mongo_to_ES_dict.json'):
         mongo_to_ES_dict = {}
     else:
-        f = open('json/mongo_to_ES_dict.json', 'r')
+        f = open('json_data/mongo_to_ES_dict.json', 'r')
         mongo_to_ES_dict = json.load(f)
         f.close()
     
@@ -204,7 +190,8 @@ def mongo_to_ES():
                     deque(parallel_bulk(ES_client, actions), maxlen=0)
                     actions = []
                 time.sleep(.01)
-    f = open('json/mongo_to_ES_dict.json', 'w')
+                
+    f = open('json_data/mongo_to_ES_dict.json', 'w')
     json.dump(mongo_to_ES_dict, f)
     f.close()
      

@@ -7,16 +7,15 @@ Created on Tue Jun 30 12:11:55 2020
 
 import pandas as pd
 from multiprocessing import Pool, Lock
-import hjson, json
+import hjson
 from time import sleep
 from datetime import datetime
 import subprocess
 import psutil
 import configparser
 import os
-from random import sample
-from operator import itemgetter 
 
+import auxiliar_functions as auxFuns
 
 #    
 def execute_newsplease_cli(newspaper_url):
@@ -50,11 +49,10 @@ def execute_newsplease_cli(newspaper_url):
     f.write('\n '+str(proc.pid))
     f.close()
 
-#        
+ #        
 def init_child(lock_):
     global lock
     lock = lock_
- 
 #
 def multiprocess(n_pools, n_min):
 
@@ -62,33 +60,8 @@ def multiprocess(n_pools, n_min):
         process = psutil.Process(proc_pid)
         for proc in process.children(recursive=True):
             proc.kill()
-        process.kill()
-    
-    def create_newsp_urls_dict(urls):
-        f = open('json_data/already_cleaned.json', 'r') ; already_cleaned = json.load(f) ; f.close()
-        for url in urls:
-            for key_ in already_cleaned.keys():
-                if url.find(key_) != -1:
-                    already_urls = already_cleaned[key_]['urls']
-                    break                
-            try:
-                f = open('json_data/' + key_+'.json', 'w')
-                json.dump({key_:already_urls}, f)
-                f.close()
-            except:
-                pass
-            
-    def load_n_per_province(n_pools):
-        f = open('json_data/prensas_all.json', 'r') ; prensa_all = json.load(f) ; f.close()
-        all_urls = []
-        for key_ in prensa_all.keys():    
-            if len(prensa_all[key_]) < n_pools:
-                continue           
-            npools_random_int = sample(range(len(prensa_all[key_])),n_pools)            
-            urls = itemgetter(*npools_random_int)(prensa_all[key_])
-            all_urls.extend(list(urls))
-        all_urls = [au.split('_')[-1] for au in all_urls]
-        return all_urls
+        process.kill()    
+
        
     lock = Lock()
     p = Pool(n_pools, initializer=init_child, initargs=(lock,))
@@ -96,15 +69,15 @@ def multiprocess(n_pools, n_min):
     # all_urls = ['https://www.diariodehuelva.es/', 'https://www.huelvabuenasnoticias.com/', 'http://huelva24.com/',
     #         'https://huelvaya.es/', 'https://www.huelvainformacion.es/', 'http://www.huelvahoy.com/']
     
-    all_urls = load_n_per_province(n_pools)
+    # all_urls = auxFuns.load_n_per_province(n_pools)
+    all_urls = auxFuns.load_community(n_pools, 'madrid')
     
     range_ = list(range(0,len(all_urls)+1,n_pools))
     for i in range(len(range_)):
-        if range_[i] == len(all_urls):
-            continue
+        if range_[i] == len(all_urls): continue
         
         urls = all_urls[range_[i]:range_[i+1]]
-        create_newsp_urls_dict(urls)
+        auxFuns.create_newsp_urls_dict(urls)
         print(urls)
         p.map(execute_newsplease_cli, urls)
         
@@ -113,14 +86,14 @@ def multiprocess(n_pools, n_min):
         procs_pid = f.readlines()
         f.close()
         
-        aux=[]
-        for ax in procs_pid:
+        proc_pids_to_remove=[]
+        for proc_pid in procs_pid:
             try:
-                aux.append(int(ax.replace('\n', ' ')))
+                proc_pids_to_remove.append(int(proc_pid.replace('\n', ' ')))
             except:
                 continue
     
-        for proc_pid in aux: 
+        for proc_pid in proc_pids_to_remove: 
             try:
                 kill(proc_pid)
             except:
