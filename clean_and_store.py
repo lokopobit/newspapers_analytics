@@ -221,3 +221,25 @@ def mongo_to_ES():
 #                 pass
 #             else:
 #                 pass
+
+# REMOVE ALL HTMLs
+# data_path = pd.read_csv('configs_path.csv')['bbdd_path'].tolist()[0]
+# newsp_paths_dict = auxFuns.fast_data_dir_walking(data_path)
+# for newsp_key in newsp_paths_dict.keys():
+#     for newsp_path in newsp_paths_dict[newsp_key]:
+#         error_files = []
+#         for file in os.scandir(newsp_path):
+#             file = file.name
+#             if file[-5:] == '.html':
+#                 error_files.append(file)
+        
+#         remove_error_files(newsp_path, error_files)
+    
+    
+    
+    
+    
+    
+    
+    
+    

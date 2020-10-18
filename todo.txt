@@ -13,7 +13,7 @@ https://www.prensaescrita.com/europa/turquia.php
 Change variable names and file names (storing_and_cleaning)
 Remove from mongodb those articles that are not articles. For example, "sobre-nosotros"
 Distinguish between news and opinion.
-Remove htmls
+Remove national newspapers from province databases (like 20minuts.es). Create national,sports,economic,..- databases.
 
 
 ### STEP 2: ANALYTICS ###
