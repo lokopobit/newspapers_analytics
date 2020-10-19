@@ -14,6 +14,7 @@ Change variable names and file names (storing_and_cleaning)
 Remove from mongodb those articles that are not articles. For example, "sobre-nosotros"
 Distinguish between news and opinion.
 Remove national newspapers from province databases (like 20minuts.es). Create national,sports,economic,..- databases.
+Check for duplicates in prensa_all and run mongo_store for all the files
 
 
 ### STEP 2: ANALYTICS ###
