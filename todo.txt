@@ -3,7 +3,7 @@ already_cleaned and already_stored jsons must be improved with a path length (fo
 crawles of the same day are not duplicated in the mongodb
 Another option to last paragraph problem is to store articles urls and avoid recrawling and remove duplicated recrawls.
 newsplease package datetime parser fails sometimes
-To increase webpages index urls extraction with selenium launch driver oonce and 
+To increase webpages index urls extraction with selenium launch driver once and 
 create new tabs instead of launching-closing driver for each url.
 main() function of get_news.py script can be optimized by merging cleaning() and insert2mong() functions at os.listdir/scandir level
 Included code lines in parse_crawler.py to avoid re-downloading are not properly placed. They are now placed in the spider
@@ -15,6 +15,7 @@ Remove from mongodb those articles that are not articles. For example, "sobre-no
 Distinguish between news and opinion.
 Remove national newspapers from province databases (like 20minuts.es). Create national,sports,economic,..- databases.
 Check for duplicates in prensa_all and run mongo_store for all the files
+Think of a way to store the log data (cleand, stored, urls)...
 
 
 ### STEP 2: ANALYTICS ###
