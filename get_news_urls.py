@@ -37,7 +37,8 @@ def create_dict(urls_dict, data_es, classes_es):
         try:
             aux = data.text +'_'+ data.a['href']
             d = start_url_driver(data.a['href'])
-            aux = data.text +'_'+ d.current_url
+            # aux = data.text +'_'+ d.current_url
+            aux = [data.text, d.current_url]
             urls_dict[classes_es[i]].append(aux)
             d.close()
             print(aux)
@@ -155,8 +156,10 @@ def remove_accents_prensa():
             
             press_url_new = []
             for press_url in prensa_dict_new[new_key]:
-                press_url0 = '_'.join(press_url.split('_')[:-1])
-                press_url1 = press_url.split('_')[-1]
+                #press_url0 = '_'.join(press_url.split('_')[:-1])
+                #press_url1 = press_url.split('_')[-1]
+                press_url0 = press_url[0]
+                press_url1 = press_url[1]
                 press_url0 = apply_encoding(press_url0)
                 press_url = press_url0 + '_' + press_url1
                 press_url_new.append(press_url)
