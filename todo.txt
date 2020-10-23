@@ -16,6 +16,7 @@ Distinguish between news and opinion.
 Remove national newspapers from province databases (like 20minuts.es). Create national,sports,economic,..- databases.
 Check for duplicates in prensa_all and run mongo_store for all the files
 Think of a way to store the log data (cleand, stored, urls)...
+Separate name of newspaper of url in prensas_* files 
 
 
 ### STEP 2: ANALYTICS ###
