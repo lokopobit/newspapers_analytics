@@ -188,24 +188,76 @@ def remove_underscore_from_prensas_files():
 
 
 def remove_duplicated_urls_from_prensas_all():
+    ###
+    ### DON'T RUN
+    ###
+    
     f = open('json_data/prensas_all.json', 'r')
     prensa_dict = json.load(f)
     f.close()    
     
+    # Create a list with all urls
     all_urls =  []
     for key_,values in prensa_dict.items():
         for val in values:
             url = val[1]
             all_urls.append(url)
 
-    unique_urls = list(set(all_urls))
+    # Find unique urls without repetitions
+    # Find repeated ones
+    unique_urls_without_repeated_ones = []
+    repeated_ones = []
+    for url in all_urls:
+        number_of_repetitions = all_urls.count(url)
+        if number_of_repetitions == 1:
+            unique_urls_without_repeated_ones.append(url)
+        else:
+            repeated_ones.append(url)
+    repeated_ones = list(set(repeated_ones))
+            
+    
+    # Create new keys for repeated ones
+    # Remove es.wikipedia.org
+    # The other urls are not changed    
     new_prensa_dict = {}
     for key_,values in prensa_dict.items():
         new_prensa_dict[key_] = []
         for val in values:
-            url = val[1]
-            if url not in unique_urls:
-                new_prensa_dict[key_].append([val[0], url])
+            if val[1] in unique_urls_without_repeated_ones and val[1] != 'es.wikipedia.org':   
+                new_prensa_dict[key_].append([val[0], val[1]])
+    
+    
+    repeated_ones_merge = {}
+    for repeated_one in repeated_ones:
+        repeated_ones_merge[repeated_one] = []
+        names, keys = [], []
+        for key_,values in prensa_dict.items():
+            for val in values:
+                if val[1] == repeated_one and val[1] != 'es.wikipedia.org':
+                    keys.append(key_)
+                    names.append(val[0])
+        repeated_ones_merge[repeated_one].append(keys)
+        repeated_ones_merge[repeated_one].append(names)
+
+    
+    for key_, values in repeated_ones_merge.items():        
+        if key_ == 'es.wikipedia.org': continue
+        
+        if len(set(repeated_ones_merge[key_][0])) == 1:
+            new_key = repeated_ones_merge[key_][0][0].split('_')[0] + '_Repeated'
+            if new_key not in  new_prensa_dict.keys(): new_prensa_dict[new_key] = []
+            new_prensa_dict[new_key].append([list(set(repeated_ones_merge[key_][1])), key_, list(set(repeated_ones_merge[key_][0]))])
+        else:
+            new_key = 'Inter_Community_Repeated'
+            if new_key not in  new_prensa_dict.keys(): new_prensa_dict[new_key] = {}
+            new_prensa_dict[new_key][key_] = values
+            
+    
+    f = open('json_data/prensas_all.json', 'w')
+    json.dump(new_prensa_dict,f)
+    f.close() 
+            
+        
 
 
 
