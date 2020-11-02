@@ -45,7 +45,7 @@ def execute_newsplease_cli(newspaper_url):
         
     # os.system('cmd /k "news-please"')
     proc=subprocess.Popen(['news-please'], shell=False)
-    f = open('json_data/process_PIDs.txt', 'a')
+    f = open('json_data/temp/process_PIDs.txt', 'a')
     f.write('\n '+str(proc.pid))
     f.close()
 
@@ -70,7 +70,7 @@ def multiprocess(n_pools, n_min):
     #         'https://huelvaya.es/', 'https://www.huelvainformacion.es/', 'http://www.huelvahoy.com/']
     
     # all_urls = auxFuns.load_n_per_province(n_pools)
-    all_urls = auxFuns.load_community(n_pools, 'madrid')
+    all_urls = auxFuns.load_community(n_pools, 'extremadura')
     
     range_ = list(range(0,len(all_urls)+1,n_pools))
     for i in range(len(range_)):
@@ -82,7 +82,7 @@ def multiprocess(n_pools, n_min):
         p.map(execute_newsplease_cli, urls)
         
         sleep(60*n_min)
-        f = open('json_data/process_PIDs.txt', 'r')
+        f = open('json_data/temp/process_PIDs.txt', 'r')
         procs_pid = f.readlines()
         f.close()
         
@@ -99,4 +99,4 @@ def multiprocess(n_pools, n_min):
             except:
                 continue
             
-        os.remove('json_data/process_PIDs.txt')
+        os.remove('json_data/temp/process_PIDs.txt')

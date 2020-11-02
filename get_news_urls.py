@@ -134,11 +134,11 @@ def remove_accents_prensa():
         new_key = new_key.decode('utf-8').replace(' ', '_')          
         return new_key
     
-    prensas = os.listdir('json_data')
+    prensas = os.listdir('json_data/tn_relaciones')
     prensas = [pr for pr in prensas if pr[:7] == 'prensa_']
     
     for prensa in prensas:
-        f = open(os.path.join('json_data', prensa), 'r')
+        f = open(os.path.join('json_data/tn_relaciones', prensa), 'r')
         prensa_dict = json.load(f)
         f.close()
         
@@ -166,7 +166,7 @@ def remove_accents_prensa():
                 
             prensa_dict_new[new_key] = press_url_new   
             
-        f = open(os.path.join('json_data', prensa), 'w')
+        f = open(os.path.join('json_data/tn_relaciones', prensa), 'w')
         json.dump(prensa_dict_new,f)
         f.close()
         

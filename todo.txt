@@ -5,7 +5,7 @@ Another option to last paragraph problem is to store articles urls and avoid rec
 newsplease package datetime parser fails sometimes
 To increase webpages index urls extraction with selenium launch driver once and 
 create new tabs instead of launching-closing driver for each url.
-main() function of get_news.py script can be optimized by merging cleaning() and insert2mong() functions at os.listdir/scandir level
+main() function of clean_and_store.py script can be optimized by merging cleaning() and insert2mong() functions at os.listdir/scandir level
 Included code lines in parse_crawler.py to avoid re-downloading are not properly placed. They are now placed in the spider
 url extraction of html but must be placed rigth before saving the json and html of that article.
 elasticsearch database
@@ -18,6 +18,8 @@ Check for duplicates in prensa_all and run mongo_store for all the files
 Think of a way to store the log data (cleand, stored, urls)...
 Manage jobdirs
 Change news-please library way of storing urls. Also make sure spider only visits the same url (sevilla.abc.es different from abc.es) 
+Threading
+Convert the paths in parameters
 
 
 ### STEP 2: ANALYTICS ###

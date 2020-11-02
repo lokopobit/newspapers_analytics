@@ -63,7 +63,7 @@ def cleaning(data_path, newsp_paths_dict):
         for ef in error_files: os.remove(os.path.join(newsp_path, ef))
     
     
-    f = open('json_data/already_cleaned.json', 'r') ; already_cleaned = json.load(f) ; f.close()   
+    f = open('json_data/logs/already_cleaned.json', 'r') ; already_cleaned = json.load(f) ; f.close()   
     # Newspaaper cleaning
     for newsp_key in newsp_paths_dict.keys():
         print('-'*20)
@@ -88,17 +88,17 @@ def cleaning(data_path, newsp_paths_dict):
             already_cleaned[newsp_key]['paths'].append(newsp_path)
             print(newsp_path.replace(data_path, ''), 'Cleaned.', 'Removed ', len(error_files), ' files')
         
-            f = open('json_data/already_cleaned.json', 'w') ; json.dump(already_cleaned,f) ; f.close()    
+            f = open('json_data/logs/already_cleaned.json', 'w') ; json.dump(already_cleaned,f) ; f.close()    
 
 
 #
 def insert2mongo(data_path, newsp_paths_dict):         
-    f = open('json_data/prensas_all.json', 'r') ; prensa_all = json.load(f) ; f.close()
+    f = open('json_data/tn_relaciones/prensas_all.json', 'r') ; prensa_all = json.load(f) ; f.close()
     db_names = []
     for key_, values in prensa_all.items():  
-        if key_.find('eportivos') != -1 or key_.find('eneral') != -1:
+        if key_.find('eportivos') != -1: #or key_.find('eneral') != -1:
             continue
-        for newsp_key in newsp_paths_dict.keys():
+        for newsp_key in newsp_paths_dict.keys(): # Remove this loop?
             aux = [val for val in values if val.find(newsp_key) != -1]
             if aux != []:
                 print(key_, newsp_key)
@@ -110,12 +110,11 @@ def insert2mongo(data_path, newsp_paths_dict):
         # db.list_collection_names()
         # collection = db.test_collection
         
-        f = open('json_data/already_stored.json', 'r') ; already_stored = json.load(f) ; f.close()
+        f = open('json_data/logs/already_stored.json', 'r') ; already_stored = json.load(f) ; f.close()
         # Newspaaper cleaning
         for newsp_key in newsp_paths_dict.keys():
             aux = [val for val in prensa_all[db_name] if val.find(newsp_key) != -1] 
-            if aux == []:
-                continue
+            if aux == []: continue
             print('-'*20)
             print('Inserting', newsp_key)
             print('-'*20)
@@ -140,17 +139,17 @@ def insert2mongo(data_path, newsp_paths_dict):
                 already_stored[newsp_key].append(newsp_path)
                 print(newsp_path.replace(data_path, ''), 'Inserted.')
             
-                f = open('json_data/already_stored.json', 'w') ; json.dump(already_stored,f) ; f.close()    
+                f = open('json_data/logs/already_stored.json', 'w') ; json.dump(already_stored,f) ; f.close()    
         
         auxFuns.close_mongo_db(client)
 
 
 def mongo_to_ES():
     
-    if not os.path.exists('json_data/mongo_to_ES_dict.json'):
+    if not os.path.exists('json_data/logs/mongo_to_ES_dict.json'):
         mongo_to_ES_dict = {}
     else:
-        f = open('json_data/mongo_to_ES_dict.json', 'r')
+        f = open('json_data/logs/mongo_to_ES_dict.json', 'r')
         mongo_to_ES_dict = json.load(f)
         f.close()
     
@@ -191,7 +190,7 @@ def mongo_to_ES():
                     actions = []
                 time.sleep(.01)
                 
-    f = open('json_data/mongo_to_ES_dict.json', 'w')
+    f = open('json_data/logs/mongo_to_ES_dict.json', 'w')
     json.dump(mongo_to_ES_dict, f)
     f.close()
      

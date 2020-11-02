@@ -15,6 +15,7 @@ import os
 from urllib.parse import urlparse
 
 
+
 #######################################
 ### FUNCTIONS RELATED TO DATABASES ####
 #######################################
@@ -67,14 +68,14 @@ def close_ES_service(close_service=False):
     
 #######################################
 def create_newsp_urls_dict(urls):
-    f = open('json_data/already_cleaned.json', 'r') ; already_cleaned = json.load(f) ; f.close()
+    f = open('json_data/logs/already_cleaned.json', 'r') ; already_cleaned = json.load(f) ; f.close()
     for url in urls:
         for key_ in already_cleaned.keys():
             if url.find(key_) != -1:
                 already_urls = already_cleaned[key_]['urls']
                 break                
         try:
-            f = open('json_data/' + key_+'.json', 'w')
+            f = open('json_data/already_crawled_urls/' + key_+'.json', 'w')
             json.dump({key_:already_urls}, f)
             f.close()
         except:
@@ -82,7 +83,7 @@ def create_newsp_urls_dict(urls):
 
         
 def load_n_per_province(n_pools):
-    f = open('json_data/prensas_all.json', 'r') ; prensa_all = json.load(f) ; f.close()
+    f = open('json_data/tn_relaciones/prensas_all.json', 'r') ; prensa_all = json.load(f) ; f.close()
     all_urls = []
     for key_ in prensa_all.keys():
         if len(prensa_all[key_]) < n_pools: continue           
@@ -94,7 +95,7 @@ def load_n_per_province(n_pools):
 
 
 def load_community(n_pools, community):
-    f = open('json_data/prensas_all.json', 'r') ; prensa_all = json.load(f) ; f.close()
+    f = open('json_data/tn_relaciones/prensas_all.json', 'r') ; prensa_all = json.load(f) ; f.close()
     all_urls = []
     for j in range(20):
         for key_ in prensa_all.keys():
@@ -132,13 +133,13 @@ def fast_data_dir_walking(data_path):
 
 
 def create_prensas_all():
-    prensas = os.listdir('json_data')
+    prensas = os.listdir('json_data/tn_relaciones')
     prensas = [pr for pr in prensas if pr[:7] == 'prensa_']
     prensas.remove('prensa_espannola.json')
     
     prensas_all={}
     for prensa in prensas:
-        f = open(os.path.join('json_data', prensa), 'r')
+        f = open(os.path.join('json_data/tn_relaciones', prensa), 'r')
         prensa_dict = json.load(f)
         f.close()
         
@@ -147,7 +148,7 @@ def create_prensas_all():
             prensas_all_key = comunidad+'_'+key_
             prensas_all[prensas_all_key] = prensa_dict[key_]
         
-    f = open('json_data/prensas_all.json', 'w')
+    f = open('json_data/tn_relaciones/prensas_all.json', 'w')
     json.dump(prensas_all,f)
     f.close()    
         
@@ -160,11 +161,11 @@ def remove_underscore_from_prensas_files():
     ### DON'T RUN
     ###
     
-    prensas = os.listdir('json_data')
+    prensas = os.listdir('json_data/tn_relaciones')
     prensas = [pr for pr in prensas if pr[:7] == 'prensa_']
     
     for prensa in prensas:
-        f = open(os.path.join('json_data', prensa), 'r')
+        f = open(os.path.join('json_data/tn_relaciones', prensa), 'r')
         prensa_dict = json.load(f)
         f.close()
 
@@ -181,7 +182,7 @@ def remove_underscore_from_prensas_files():
                     aux = urlparse(newspaper_url)
                 new_prensa_dict[key_].append([newspaper_name,aux.netloc])
                     
-        f = open(os.path.join('json_data', prensa), 'w')
+        f = open(os.path.join('json_data/tn_relaciones', prensa), 'w')
         json.dump(new_prensa_dict, f)
         f.close()
 
@@ -192,7 +193,7 @@ def remove_duplicated_urls_from_prensas_all():
     ### DON'T RUN
     ###
     
-    f = open('json_data/prensas_all.json', 'r')
+    f = open('json_data/tn_relaciones/prensas_all.json', 'r')
     prensa_dict = json.load(f)
     f.close()    
     
@@ -253,10 +254,46 @@ def remove_duplicated_urls_from_prensas_all():
             new_prensa_dict[new_key][key_] = values
             
     
-    f = open('json_data/prensas_all.json', 'w')
+    f = open('json_data/tn_relaciones/prensas_all.json', 'w')
     json.dump(new_prensa_dict,f)
     f.close() 
             
+    
+def create_aux_dict_with_prensas_all_keys_and_values_interchanged():
+    f = open('json_data/tn_relaciones/prensas_all.json', 'r')
+    prensa_dict = json.load(f)
+    f.close()    
+    
+    prensas_all_interchanged = {}
+    for key_, values in prensa_dict.items():
+        if key_ == 'Inter_Community_Repeated':
+            for key_1 in  prensa_dict['Inter_Community_Repeated'].keys():
+                prensas_all_interchanged[key_1] = 'Inter_Community_Repeated'
+            continue
+        for val in values:
+            prensas_all_interchanged[val[1]] = key_
+            
+            
+def check_newsp_db_names_match_aux_prensas_all_interchanged_keys():
+    prensas_all_interchanged = create_aux_dict_with_prensas_all_keys_and_values_interchanged()
+    f = open('json_data/logs/already_stored.json', 'r') ; already_stored = json.load(f) ; f.close()
+    
+    j = 0
+    aux0 = []
+    aux1 = []
+    for interchanged_key in prensas_all_interchanged.keys():
+        for already_stored_key in already_stored.keys():
+            cond1 = interchanged_key.split('.')[-1] == already_stored_key.split('.')[-1]
+            cond2 = interchanged_key.split('.')[-2] == already_stored_key.split('.')[-2]
+            if cond1 and cond2:
+                aux0.append(interchanged_key.split('.')[-2])
+                aux1.append(already_stored_key.split('.')[-2])
+                # print(j, len(already_stored.keys()))
+                # print(interchanged_key, already_stored_key)
+                j += 1
+                
+                if interchanged_key.find('abc') != -1:
+                    print(interchanged_key)
         
 
 

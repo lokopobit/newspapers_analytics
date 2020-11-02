@@ -21,7 +21,7 @@ if __name__ ==  '__main__':
     
     if execute_multiprocess:
         # Scrape data 
-        n_pools = 4
+        n_pools = 2
         n_min = 2
         execute_newsplease_cli.multiprocess(n_pools, n_min)
     

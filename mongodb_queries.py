@@ -36,7 +36,7 @@ def mongoQueries():
     db_names_to_exclude = ['admin','config','local']
     all_db_names = client.list_database_names()
     for ax in db_names_to_exclude: all_db_names.remove(ax)
-    db_name = all_db_names[-1]
+    db_name = all_db_names[-4]
     db = auxFuns.open_mongo_db(client, db_name)
     for i in range(len(db.list_collection_names())):
         collection = db.list_collection_names()[i]
