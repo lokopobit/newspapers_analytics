@@ -104,7 +104,7 @@ def load_community(n_pools, community):
             npools_random_int = sample(range(len(prensa_all[key_])),n_pools)            
             urls = itemgetter(*npools_random_int)(prensa_all[key_])
             all_urls.extend(list(urls))
-    all_urls = [au.split('_')[-1] for au in all_urls]
+    all_urls = [au[1] for au in all_urls]
     return all_urls
         
         
@@ -260,6 +260,7 @@ def remove_duplicated_urls_from_prensas_all():
             
     
 def create_aux_dict_with_prensas_all_keys_and_values_interchanged():
+    #
     f = open('json_data/tn_relaciones/prensas_all.json', 'r')
     prensa_dict = json.load(f)
     f.close()    
@@ -275,6 +276,7 @@ def create_aux_dict_with_prensas_all_keys_and_values_interchanged():
             
             
 def check_newsp_db_names_match_aux_prensas_all_interchanged_keys():
+    #
     prensas_all_interchanged = create_aux_dict_with_prensas_all_keys_and_values_interchanged()
     f = open('json_data/logs/already_stored.json', 'r') ; already_stored = json.load(f) ; f.close()
     

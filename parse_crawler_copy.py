@@ -14,24 +14,6 @@ from ..crawler.items import NewscrawlerItem
 # to improve performance, regex statements are compiled only once per module
 re_html = re.compile('text/html')
 
-repo_folder_path = os.getenv('newspapers_analytics_path')
-f = open(os.path.join(repo_folder_path,'json_data\\logs\\already_cleaned.json'), 'r') ; already_cleaned = json.load(f) ; f.close()
-config_path = pd.read_csv(os.path.join(repo_folder_path,'configs_path.csv'))['config_path'].tolist()[0]
-f = open(os.path.join(config_path, 'sitelist.hjson'), 'r')
-nc = hjson.load(f)
-newspaper_url=nc['base_urls'][0]['url']
-f.close()
-for key_ in already_cleaned.keys():
-    if newspaper_url.find(key_) != -1:
-        f = open(repo_folder_path+'\\json_data\\already_crawled_urls\\'+key_+'.json', 'r')
-        already_urls = json.load(f)
-        already_urls = already_urls[key_]
-        f.close()
-        break
-        
-print('-'*200)
-print(key_, newspaper_url)
-time.sleep(10)
 
 class ParseCrawler(object):
     """
@@ -61,7 +43,41 @@ class ParseCrawler(object):
         :param str rss_title: the title extracted by an rssCrawler
         :return NewscrawlerItem: NewscrawlerItem to pass to the pipeline
         """
-        if self.helper.heuristics.is_article(response, original_url):
+        
+        repo_folder_path = os.getenv('newspapers_analytics_path')
+        f = open(os.path.join(repo_folder_path,'json_data\\logs\\already_cleaned.json'), 'r') ; already_cleaned = json.load(f) ; f.close()
+        config_path = pd.read_csv(os.path.join(repo_folder_path,'configs_path.csv'))['config_path'].tolist()[0]
+        f = open(os.path.join(config_path, 'sitelist.hjson'), 'r')
+        nc = hjson.load(f)
+        #newspaper_url=nc['base_urls'][0]['url']
+        newspaper_url = original_url
+        f.close()
+        not_founded=True
+        for key_ in already_cleaned.keys():
+            if newspaper_url.find(key_) != -1:
+                f = open(repo_folder_path+'\\json_data\\already_crawled_urls\\'+key_+'.json', 'r')
+                already_urls = json.load(f)
+                already_urls = already_urls[key_]
+                f.close()
+                not_founded=False
+                print('-'*200)
+                print('Check: ', key_, newspaper_url)
+                print('Connection NOT Founded: ', not_founded)
+                break
+         
+        if not_founded:
+            print('-'*200)
+            print('Check: ', key_, newspaper_url)
+            print('Connection NOT Founded: ', not_founded)
+            already_urls = []
+          
+        time.sleep(10)
+        
+        if self.helper.heuristics.is_article(response, original_url) \
+            and not response.url in already_urls:
+            print('*'*100)
+            print('New Article Founded')
+            print('*'*100)
             return self.pass_to_pipeline(
                 response, source_domain, rss_title=None)
 
@@ -123,22 +139,34 @@ class ParseCrawler(object):
         # that do not point to irrelevant file types
         # or contain any of the given ignore_regex regexes
 
-        aux = [
-            response.urljoin(href)
-            for href in response.css("a::attr('href')").extract() if re.match(
-                r'.*\.' + ignore_file_extensions +
-                r'$', response.urljoin(href), re.IGNORECASE
-            ) is None
-            and len(re.match(ignore_regex, response.urljoin(href)).group(0)) == 0
-            and not response.urljoin(href).find('javascript:') != -1
-            and not response.urljoin(href).find('mailto:') != -1
-            and not response.urljoin(href) in already_urls
-        ]
+        # aux = [
+            # response.urljoin(href)
+            # for href in response.css("a::attr('href')").extract() if re.match(
+                # r'.*\.' + ignore_file_extensions +
+                # r'$', response.urljoin(href), re.IGNORECASE
+            # ) is None
+            # and len(re.match(ignore_regex, response.urljoin(href)).group(0)) == 0
+            # and not response.urljoin(href).find('javascript:') != -1
+            # and not response.urljoin(href).find('mailto:') != -1
+            # and not response.urljoin(href) in already_urls
+        # ]
         
-        for ax in aux:
-            if ax in already_urls:
-                print(ax, already_urls.index(ax))
-                time.sleep(5)
+        # for ax in aux:
+            # if ax in already_urls:
+                # print(ax, already_urls.index(ax))
+                # time.sleep(5)
+
+        # return [
+            # scrapy.Request(response.urljoin(href), callback=spider.parse)
+            # for href in response.css("a::attr('href')").extract() if re.match(
+                # r'.*\.' + ignore_file_extensions +
+                # r'$', response.urljoin(href), re.IGNORECASE
+            # ) is None
+            # and len(re.match(ignore_regex, response.urljoin(href)).group(0)) == 0
+            # and not response.urljoin(href).find('javascript:') != -1
+            # and not response.urljoin(href).find('mailto:') != -1
+            # and not response.urljoin(href) in already_urls
+        # ]
 
         return [
             scrapy.Request(response.urljoin(href), callback=spider.parse)
@@ -149,10 +177,8 @@ class ParseCrawler(object):
             and len(re.match(ignore_regex, response.urljoin(href)).group(0)) == 0
             and not response.urljoin(href).find('javascript:') != -1
             and not response.urljoin(href).find('mailto:') != -1
-            and not response.urljoin(href) in already_urls
-        ]
-
-
+            ]
+        
     def content_type(self, response):
         """
         Ensures the response is of type
