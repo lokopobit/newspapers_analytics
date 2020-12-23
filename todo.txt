@@ -6,8 +6,6 @@ newsplease package datetime parser fails sometimes
 To increase webpages index urls extraction with selenium launch driver once and 
 create new tabs instead of launching-closing driver for each url.
 main() function of clean_and_store.py script can be optimized by merging cleaning() and insert2mong() functions at os.listdir/scandir level
-Included code lines in parse_crawler.py to avoid re-downloading are not properly placed. They are now placed in the spider
-url extraction of html but must be placed rigth before saving the json and html of that article.
 elasticsearch database
 https://www.prensaescrita.com/europa/turquia.php
 Change variable names and file names (storing_and_cleaning)
@@ -20,7 +18,7 @@ Manage jobdirs
 Change news-please library way of storing urls. Also make sure spider only visits the same url (sevilla.abc.es different from abc.es) 
 Threading
 Convert the paths in parameters
-
+Improve parse_crawler.py efficiency (reading of json data only once)
 
 ### STEP 2: ANALYTICS ###
 similarity measures between titulares texto (como para comprobar plagios)
