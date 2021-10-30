@@ -60,15 +60,15 @@ class ParseCrawler(object):
                 already_urls = already_urls[key_]
                 f.close()
                 not_founded=False
-                print('-'*200)
-                print('Check: ', key_, newspaper_url)
-                print('Connection NOT Founded: ', not_founded)
+                # print('-'*200)
+                # print('Check: ', key_, newspaper_url)
+                # print('Connection NOT Founded: ', not_founded)
                 break
          
         if not_founded:
-            print('-'*200)
-            print('Check: ', key_, newspaper_url)
-            print('Connection NOT Founded: ', not_founded)
+            # print('-'*200)
+            # print('Check: ', key_, newspaper_url)
+            # print('Connection NOT Founded: ', not_founded)
             already_urls = []
           
         time.sleep(10)

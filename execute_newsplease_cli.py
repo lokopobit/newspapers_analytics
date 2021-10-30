@@ -31,7 +31,8 @@ def execute_newsplease_cli(newspaper_url):
         news_config = 'sitelist.hjson'
         f = open(os.path.join(config_path, news_config), 'r')
         nc = hjson.load(f)
-        nc['base_urls'][0]['url'] = newspaper_url
+        nc['base_urls'][0]['url'] = newspaper_url[0]
+        nc['base_urls'][1]['url'] = newspaper_url[1]
         
         f = open(os.path.join(config_path, news_config), 'w')
         hjson.dump(nc, f)
@@ -39,7 +40,7 @@ def execute_newsplease_cli(newspaper_url):
         
         config = configparser.RawConfigParser()
         config.read(os.path.join(config_path,general_config))
-        config.set('Scrapy', 'JOBDIRNAME', 'jobdir'+newspaper_url.split('.')[1]+str(datetime.today()).replace(':','-'))
+        config.set('Scrapy', 'JOBDIRNAME', 'jobdir'+newspaper_url[0].split('.')[1]+str(datetime.today()).replace(':','-'))
         with open(os.path.join(config_path,general_config), 'w') as configfile:
             config.write(configfile)
         
@@ -70,15 +71,19 @@ def multiprocess(n_pools, n_min):
     #         'https://huelvaya.es/', 'https://www.huelvainformacion.es/', 'http://www.huelvahoy.com/']
     
     # all_urls = auxFuns.load_n_per_province(n_pools)
-    all_urls = auxFuns.load_community(n_pools, 'extremadura')
-    
+    all_urls = auxFuns.load_community(n_pools, 'andalucia')
+
+    all_urls = [['https://www.diariodehuelva.es/', 'https://www.huelvabuenasnoticias.com/'], ['http://huelva24.com/', 'https://huelvaya.es/']]
+    p.map(execute_newsplease_cli, all_urls)
+    sleep(60*10)
+
     range_ = list(range(0,len(all_urls)+1,n_pools))
     for i in range(len(range_)):
         if range_[i] == len(all_urls): continue
         
         urls = all_urls[range_[i]:range_[i+1]]
         auxFuns.create_newsp_urls_dict(urls)
-        print(urls)
+        print('Urls to Download: ', urls)
         p.map(execute_newsplease_cli, urls)
         
         sleep(60*n_min)
